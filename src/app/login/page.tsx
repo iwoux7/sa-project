@@ -1,0 +1,59 @@
+'use client';
+import { useState } from 'react';
+
+export default function LoginPage() {
+  const [formData, setFormData] = useState({
+    username: '',
+    password: ''
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log('Login:', formData);
+  };
+
+  return (
+    <div className="blue-bg">
+      <div className="login-card">
+        <h1 className="login-title">เข้าสู่ระบบ</h1>
+        
+        <form onSubmit={handleSubmit}>
+          <div>
+            <label>อีเมล</label>
+            <input
+              type="text"
+              placeholder="อีเมล"
+              className="login-input"
+              value={formData.username}
+              onChange={(e) => setFormData({...formData, username: e.target.value})}
+            />
+          </div>
+
+          <div>
+            <label>รหัสผ่าน</label>
+            <input
+              type="password"
+              placeholder="รหัสผ่าน"
+              className="login-input"
+              value={formData.password}
+              onChange={(e) => setFormData({...formData, password: e.target.value})}
+            />
+          </div>
+
+          <div className="button-container">
+            <button type="submit" className="login-button">
+              เข้าสู่ระบบ
+            </button>
+          </div>
+
+          <div className="text-center mt-4">
+            <a>ไม่เคยมีบัญชีกับเรามาก่อน? </a> 
+            <a href="#" className="no-account">
+             <u>ลงทะเบียนที่นี่</u>
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
