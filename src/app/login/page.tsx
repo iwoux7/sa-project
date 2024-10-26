@@ -42,14 +42,14 @@ export default function LoginPage() {
           </div>
 
           <div className="button-container-login">
-            <button type="submit" className="login-button">
+            <button type="submit" className="button">
               เข้าสู่ระบบ
             </button>
           </div>
 
           <div className="text-center mt-4">
             <a>ไม่เคยมีบัญชีกับเรามาก่อน? </a> 
-            <a href="#" className="no-account">
+            <a href="/register" className="no-account">
              <u>ลงทะเบียนที่นี่</u>
             </a>
           </div>

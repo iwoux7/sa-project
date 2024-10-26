@@ -1,8 +1,9 @@
 'use client';
 import { useState } from 'react';
 import Link from 'next/link';
+import { Modal } from '../../components/modal';  // Relative path
 
-export default function LoginPage() {
+export default function RegisterPage() {
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -12,9 +13,11 @@ export default function LoginPage() {
     address: '',
   });
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Login:', formData);
+    setIsModalOpen(true);  // Open modal when form is submitted
   };
 
   return (
@@ -82,7 +85,6 @@ export default function LoginPage() {
             <div className='address-forn-input'>
                 <label>ที่อยู่</label><label style={{ color: '#FF0000' }}>*</label>
                 <textarea
-                    // type='text'
                     placeholder='ที่อยู่'
                     className='address-input'
                     value={formData.address}
@@ -90,13 +92,53 @@ export default function LoginPage() {
                 />
             </div>
 
+                <div className="button-container-register">
+                    <button type="submit" className="button">
+                    ลงทะเบียน
+                    </button>
+                </div>
 
-            <div className="button-container-register">
+                <div className="text-center mt-4">
+                    <a>มีบัญชีอยู่แล้ว </a> 
+                    <Link href="/login" className="no-account">
+                    <u>เข้าสู่ระบบที่นี่</u>
+                    </Link>
+                </div>
+            </form>
+        </div>
+
+      <Modal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)}
+      >
+        <h2 style={{ 
+          fontSize: '1.5rem', 
+          marginBottom: '1rem',
+          color: '#004D9F'
+        }}>
+          <b>ยินดีต้อนรับสู่เว็บไซต์ของ Tech Lifestyle</b>
+        </h2>
+        <p style={{ marginBottom: '1rem' }}>
+          <b>ขอบคุณที่ลงทะเบียนเข้าเป็นสมาชิกของเรา</b>
+        </p>
+        <p>
+          <b>หวังว่าบริการของเราจะสามารถช่วยเหลือคุณได้ในอนาคต</b>
+        </p>
+      </Modal>
+    
+
+{/* -------------------------------------------------------------------------------- */}
+            {/* <div className="button-container-register">
                 <button type="submit" className="login-button">
                 ลงทะเบียน
                 </button>
-                
+                <div style={{ marginTop: '1rem' }}>
+                    <Link href="/login" className="back-to-login">
+                    กลับไปหน้าเข้าสู่ระบบ
+                    </Link>
+                </div>
             </div>
+            
 
             <div className="text-center mt-4">
                 <a>มีบัญชีอยู่แล้ว </a> 
@@ -104,9 +146,27 @@ export default function LoginPage() {
                 <u>เข้าสู่ระบบที่นี่</u>
                 </a>
             </div>
-            </form>
+        </form>
+
+        <Modal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)}>
+        <h2 style={{ 
+          fontSize: '1.5rem', 
+          marginBottom: '1rem',
+          color: '#2563EB'
+        }}>
+          ยินดีต้อนรับสู่เว็บไซต์ของ Tech Lifestyle
+        </h2>
+        <p style={{ marginBottom: '1rem' }}>
+          ขอบคุณที่ลงทะเบียนเข้าเป็นสมาชิกของเรา
+        </p>
+        <p>
+          หวังว่าบริการของเราจะสามารถช่วยเหลือคุณได้ในอนาคต
+        </p>
+      </Modal> */
+      }
         </div>
-      </div>
     </div>
   );
 }
