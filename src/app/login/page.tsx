@@ -1,9 +1,10 @@
 'use client';
 import { useState } from 'react';
+import Link from 'next/link';
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({
-    username: '',
+    email: '',
     password: ''
   });
 
@@ -19,18 +20,18 @@ export default function LoginPage() {
         
         <form onSubmit={handleSubmit}>
           <div>
-            <label>อีเมล</label>
+            <label>อีเมล</label><label style={{ color: '#FF0000' }}>*</label>
             <input
-              type="text"
+              type="enail"
               placeholder="อีเมล"
               className="login-input"
-              value={formData.username}
-              onChange={(e) => setFormData({...formData, username: e.target.value})}
+              value={formData.email}
+              onChange={(e) => setFormData({...formData, email: e.target.value})}
             />
           </div>
 
           <div>
-            <label>รหัสผ่าน</label>
+            <label>รหัสผ่าน</label><label style={{ color: '#FF0000' }}>*</label>
             <input
               type="password"
               placeholder="รหัสผ่าน"
@@ -40,7 +41,7 @@ export default function LoginPage() {
             />
           </div>
 
-          <div className="button-container">
+          <div className="button-container-login">
             <button type="submit" className="login-button">
               เข้าสู่ระบบ
             </button>
