@@ -140,3 +140,57 @@ body {
   background: #888;
   border-radius: 3px;
 }
+
+.nav-link {
+  @apply text-[#004D9F] hover:text-[#ffffff] px-3 py-2 transition-colors duration-200 ;
+}
+
+.nav-link:hover{
+  border: none;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  border-radius: 4px;
+  background-color: #004D9F; 
+}
+
+
+.navbar-shadow {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-container {
+  height: 90px; 
+}
+
+.logo-container {
+  /* padding-top: 2rem; */
+  height: 150px;
+  display: flex;
+  align-items: center;
+}
+
+.logo-image {
+  height: 160px;  /* h-10 = 2.5rem = 40px */
+  object-fit: contain;
+}
+
+.element-container{
+  margin: 3rem;
+}
+
+.bell-icon{
+  display: flex;
+  margin-left: 500px;
+  margin-right: 25px;
+  align-items: center;
+}
+
+.hamburger-icon{
+  display: flex;
+  align-items: center;
+}
+
+.icon-container .bell-icon,
+.icon-container .hamburger-icon {
+    margin: 0 10px; /* Adjust as needed for spacing */
+}

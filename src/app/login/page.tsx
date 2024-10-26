@@ -42,9 +42,9 @@ export default function LoginPage() {
           </div>
 
           <div className="button-container-login">
-            <button type="submit" className="button">
+            <a href='/home' className="button">
               เข้าสู่ระบบ
-            </button>
+            </a>
           </div>
 
           <div className="text-center mt-4">
