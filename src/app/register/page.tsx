@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import Link from 'next/link';
-import { Modal } from '../../components/modal';  // Relative path
+import { Modal } from '@/components/Modal';  // Relative path
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
