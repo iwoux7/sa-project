@@ -1,6 +1,6 @@
     'use client';
     import React, { useState } from 'react';
-    import { Navbar } from '@/layouts/Navbar';
+    import { Navbar } from '@/layouts/AdminNavbar';
     import Link from 'next/link';
     import { Search, Plus } from 'lucide-react';
     import AddOrderDialog from '@/components/AddOrderDialog';
