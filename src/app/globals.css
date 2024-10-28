@@ -14,6 +14,18 @@
   }
 }
 
+@layer base {
+  html {
+    font-family: 'Noto Sans Thai Looped', sans-serif;
+  }
+}
+
+@layer utilities {
+  .font-noto-thai {
+    font-family: 'Noto Sans Thai Looped', sans-serif;
+  }
+}
+
 body {
   color: var(--foreground);
   background: var(--background);
@@ -98,6 +110,63 @@ body {
   border: none;
   border-radius: 4px;
   cursor: pointer;
+}
+
+.buttonemerald {
+  padding: 0.75rem 2rem;
+  background-color: #34BE82;
+  color: black;
+  border: 1.5px solid black;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.buttonemerald:hover {
+  background-color: #3dd494;
+  box-shadow: 2px 2px 0px 0px rgba(0,0,0,1);
+}
+
+.buttonemerald:active {
+  transform: translate(2px, 2px);
+  box-shadow: none;
+}
+
+.buttonyellow {
+  padding: 0.75rem 2rem;
+  background-color: #FFD700;
+  color: black;
+  border: 1.5px solid black;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.buttonyellow:hover {
+  background-color: #FFD700;
+  box-shadow: 2px 2px 0px 0px rgba(0,0,0,1);
+}
+
+.buttonyellow:active {
+  transform: translate(2px, 2px);
+  box-shadow: none;
+}
+
+.buttonwhite {
+  padding: 0.75rem 2rem;
+  background-color: #ffffff;
+  color: black;
+  border: 1.5px solid black;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.buttonwhite:hover {
+  background-color: #ffffff;
+  box-shadow: 2px 2px 0px 0px rgba(0,0,0,1);
+}
+
+.buttonwhite:active {
+  transform: translate(2px, 2px);
+  box-shadow: none;
 }
 
 .no-account {
