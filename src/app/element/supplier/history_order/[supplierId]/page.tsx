@@ -98,8 +98,8 @@ const HistoryOrderList = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
-      <main className="max-w-7xl mx-auto px-1 py-6">
-        <div className="bg-white rounded-lg shadow p-6">
+      <main className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-6 pt-14 sm:pt-16 md:pt-20">
+        <div className="bg-white rounded-lg shadow p-3 sm:p-4 md:p-12">
                 <Link href="/element" className="inline-flex items-center text-[#004D9F] hover:underline">
                 <ChevronLeft className="w-4 h-4 mr-1" />
                 ย้อนกลับ
@@ -132,34 +132,38 @@ const HistoryOrderList = () => {
             />
           </div>
 
-          {/* Table */}
-          <div className="overflow-x-auto">
-            <table className="min-w-full border-collapse border-black">
-              <thead>
-                <tr className="bg-[#004D9F]">
-                  <th className="px-4 py-3 text-left text-white font-medium border-b border-blue-500">Order Date วันที่สั่งซื้อชิ้นส่วน</th>
-                  <th className="px-4 py-3 text-left text-white font-medium border-b border-blue-500">Supplier ID รหัส Supplier</th>
-                  <th className="px-4 py-3 text-left text-white font-medium border-b border-blue-500">Element ID รหัสชิ้นส่วน</th>
-                  <th className="px-4 py-3 text-left text-white font-medium border-b border-blue-500">Amount จำนวน</th>
-                  <th className="px-4 py-3 text-left text-white font-medium border-b border-blue-500">Price ราคา</th>
-                  <th className="px-4 py-3 text-left text-white font-medium border-b border-blue-500">Total Price ราคารวม</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredHistoryOrder.map((historyorder , index) => (
-                  <tr key={`${historyorder.historyorderDate}-${historyorder.elementId}-${historyorder.supplierId}-${index}`}  
-                  className="border-b hover:bg-gray-50">
-                    <td className="px-4 py-3 text-gray-900">{historyorder.historyorderDate}</td>
-                    <td className="px-4 py-3 text-gray-600">{historyorder.supplierId}</td>
-                    <td className="px-4 py-3 text-gray-600">{historyorder.elementId}</td>
-                    <td className="px-4 py-3 text-gray-600">{historyorder.amount}</td>
-                    <td className="px-4 py-3 text-gray-600">{historyorder.price}</td>
-                    <td className="px-4 py-3 text-gray-600">{(historyorder.price * historyorder.amount).toLocaleString()}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+            {/* Table */}
+            <div className="px-1 sm:px-2 md:px-6 ">
+                <div className="overflow-x-auto -mx-3 sm:-mx-4 md:-mx-6 overflow-hidden border border-gray-200 rounded-lg shadow-sm">
+                    <div className="inline-block min-w-full align-middle">
+                        <table className="min-w-full border-collapse border-black">
+                            <thead>
+                                <tr className="bg-[#004D9F]">
+                                <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-white text-xs sm:text-sm font-medium border-b border-blue-500">Order Date วันที่สั่งซื้อชิ้นส่วน</th>
+                                <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-white text-xs sm:text-sm font-medium border-b border-blue-500">Supplier ID รหัส Supplier</th>
+                                <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-white text-xs sm:text-sm font-medium border-b border-blue-500">Element ID รหัสชิ้นส่วน</th>
+                                <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-white text-xs sm:text-sm font-medium border-b border-blue-500">Amount จำนวน</th>
+                                <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-white text-xs sm:text-sm font-medium border-b border-blue-500">Price ราคา</th>
+                                <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-white text-xs sm:text-sm font-medium border-b border-blue-500">Total Price ราคารวม</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {filteredHistoryOrder.map((historyorder , index) => (
+                                <tr key={`${historyorder.historyorderDate}-${historyorder.elementId}-${historyorder.supplierId}-${index}`}  
+                                className="border-b hover:bg-gray-50">
+                                    <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-900">{historyorder.historyorderDate}</td>
+                                    <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-900">{historyorder.supplierId}</td>
+                                    <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-900">{historyorder.elementId}</td>
+                                    <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-900">{historyorder.amount}</td>
+                                    <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-900">{historyorder.price}</td>
+                                    <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-900">{(historyorder.price * historyorder.amount).toLocaleString()}</td>
+                                </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
       </main>
 

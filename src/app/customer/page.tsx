@@ -38,9 +38,9 @@ export default function CustomerList  () {
     return (
         <div className="min-h-screen bg-gray-50">
         <Navbar />
-        <main className="max-w-7xl mx-auto px-1 py-6">
-            <div className="bg-white rounded-lg shadow p-6">
-            <h1 style={{ color: '#004D9F' }} className="text-2xl font-semibold text-center mb-6">
+        <main className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-6 pt-14 sm:pt-16 md:pt-20">
+            <div className="bg-white rounded-lg shadow p-3 sm:p-4 md:p-12">
+            <h1 style={{ color: '#004D9F' }} className="text-xl sm:text-2xl lg:text-3xl font-semibold text-center mb-4 sm:mb-6">
                 รายชื่อลูกค้า
             </h1>
             
@@ -61,56 +61,60 @@ export default function CustomerList  () {
             </div>
 
             {/* Table */}
-            <div className="overflow-x-auto">
-                <table className="min-w-full border-collapse border-black">
-                <thead>
-                    <tr className="bg-[#004D9F] ">
-                    <th className="px-4 py-3 text-left text-white font-medium border-b border-blue-500">Customer ID รหัสลูกค้า</th>
-                    <th className="px-4 py-3 text-left text-white font-medium border-b border-blue-500">Customer Name ชื่อ - นามสกุลลูกค้า</th>
-                    <th className="px-4 py-3 text-left text-white font-medium border-b border-blue-500">Phone Number เบอร์โทร</th>
-                    <th className="px-4 py-3 text-left text-white font-medium border-b border-blue-500">Email</th>
-                    <th className="px-4 py-3 text-left text-white font-medium border-b border-blue-500">Address</th>
-                    <th className="px-4 py-3 text-left text-white font-medium border-b border-blue-500">Customer Status</th>
-                    <th className="px-4 py-3 text-left text-white font-medium border-b border-blue-500">Question</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {filteredCustomers.map((customer) => (
-                    <tr key={customer.customerId} className="border-b hover:bg-gray-50">
-                        <td className="px-4 py-3 font-medium text-gray-900">
-                        <Link 
-                            href={{
-                                pathname: `/customer/${customer.customerId}`,
-                                query: {
-                                customerName: customer.customerName,
-                                customerPhone_Number: customer.customerPhone_Number,
-                                customerEmail: customer.customerEmail,
-                                customerAddress: customer.cusrtomerAddress,
-                                customerStatus: customer.customerStatus,
-                                customerQuestion: customer.customerQuestion
-                                }
-                            }}
-                            className="text-[#004D9F] hover:text-[#004D9F] hover:underline"
-                            >
-                            {customer.customerId}
-                            </Link>
-                        </td>
-                        <td className="px-4 py-3 font-medium text-gray-600">{customer.customerName}</td>
-                        <td className="px-4 py-3 text-gray-600">{customer.customerPhone_Number}</td>
-                        <td className="px-4 py-3 text-gray-600">{customer.customerEmail}</td>
-                        <td className="px-4 py-3 text-gray-600">{customer.customerEmail}</td>
-                        <td className="px-4 py-3"> {customer.customerStatus && (
-                            <span className="bg-yellow-300 px-2 py-1 rounded text-black whitespace-nowrap">
-                            {customer.customerStatus}
-                        </span>
-                        )}
-                        </td>
-                        <td className="px-4 py-3 font-medium text-gray-900">{customer.customerQuestion}</td>
-                    </tr>
-                    ))}
-                </tbody>
-                </table>
-            </div>
+            <div className="px-1 sm:px-2 md:px-6 ">
+                <div className="overflow-x-auto -mx-3 sm:-mx-4 md:-mx-6 overflow-hidden border border-gray-200 rounded-lg shadow-sm">
+                    <div className="inline-block min-w-full align-middle">
+                            <table className="min-w-full border-collapse border-black">
+                                <thead>
+                                    <tr className="bg-[#004D9F] ">
+                                    <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-white text-xs sm:text-sm font-medium border-b border-blue-500">Customer ID รหัสลูกค้า</th>
+                                    <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-white text-xs sm:text-sm font-medium border-b border-blue-500">Customer Name ชื่อ - นามสกุลลูกค้า</th>
+                                    <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-white text-xs sm:text-sm font-medium border-b border-blue-500">Phone Number เบอร์โทร</th>
+                                    <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-white text-xs sm:text-sm font-medium border-b border-blue-500">Email</th>
+                                    <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-white text-xs sm:text-sm font-medium border-b border-blue-500">Address</th>
+                                    <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-white text-xs sm:text-sm font-medium border-b border-blue-500">Customer Status</th>
+                                    <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-white text-xs sm:text-sm font-medium border-b border-blue-500">Question</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {filteredCustomers.map((customer) => (
+                                    <tr key={customer.customerId} className="border-b hover:bg-gray-50">
+                                        <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-gray-900">
+                                        <Link 
+                                            href={{
+                                                pathname: `/customer/${customer.customerId}`,
+                                                query: {
+                                                customerName: customer.customerName,
+                                                customerPhone_Number: customer.customerPhone_Number,
+                                                customerEmail: customer.customerEmail,
+                                                customerAddress: customer.cusrtomerAddress,
+                                                customerStatus: customer.customerStatus,
+                                                customerQuestion: customer.customerQuestion
+                                                }
+                                            }}
+                                            className="text-[#004D9F] hover:text-[#004D9F] hover:underline"
+                                            >
+                                            {customer.customerId}
+                                            </Link>
+                                        </td>
+                                        <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-900">{customer.customerName}</td>
+                                        <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-900">{customer.customerPhone_Number}</td>
+                                        <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-900">{customer.customerEmail}</td>
+                                        <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-900">{customer.customerEmail}</td>
+                                        <td className="px-2 sm:px-4 py-2 sm:py-3 "> {customer.customerStatus && (
+                                            <span className="px-2 sm:px-4 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm bg-yellow-100 text-yellow-800 whitespace-nowrap">
+                                            {customer.customerStatus}
+                                        </span>
+                                        )}
+                                        </td>
+                                        <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-900">{customer.customerQuestion}</td>
+                                    </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
         </main>
     </div>

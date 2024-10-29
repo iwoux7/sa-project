@@ -221,8 +221,6 @@ nav {
 
 .nav-link:hover{
   border: none;
-  padding-top: 1rem;
-  padding-bottom: 1rem;
   border-radius: 4px;
   background-color: #004D9F; 
 }
@@ -684,6 +682,7 @@ nav {
   gap: 10px;
   font-size: 16px;
   line-height: 1.5;
+  color:#000000;
 }
 
 .required {
@@ -712,6 +711,7 @@ nav {
 
 .form-group {
   margin-bottom: 20px;
+  color: #000000;
 }
 
 /* Responsive design */

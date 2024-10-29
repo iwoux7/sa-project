@@ -113,11 +113,11 @@ export default function ContactPage() {
   };
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col bg-white">
       <Navbar />
       <section id="contact" className='service-card'>
         <div className="container mx-auto">
-          <h2 className="text-2xl font-bold mb-8 text-center">
+          <h2 style={{ color: '#004D9F' }} className="text-2xl font-bold mb-8 text-center">
             ติดต่อเรา
           </h2>
           <div className="contact-container">
@@ -205,7 +205,7 @@ export default function ContactPage() {
                 </div>
 
                 <div className="button-container-green">
-                  <button type="submit" className="green-button">
+                  <button type="submit" className="buttonemerald">
                     ติดต่อเรา
                   </button>
                 </div>

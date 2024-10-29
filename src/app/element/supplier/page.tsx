@@ -92,8 +92,8 @@ const SupplierList = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
-      <main className="max-w-7xl mx-auto px-1 py-6">
-        <div className="bg-white rounded-lg shadow p-6">
+      <main className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-6 pt-14 sm:pt-16 md:pt-20">
+        <div className="bg-white rounded-lg shadow p-3 sm:p-4 md:p-12">
                 <Link href="/element" className="inline-flex items-center text-[#004D9F] hover:underline">
                 <ChevronLeft className="w-4 h-4 mr-1" />
                 ย้อนกลับ
@@ -127,36 +127,40 @@ const SupplierList = () => {
           </div>
 
           {/* Table */}
-          <div className="overflow-x-auto">
-            <table className="min-w-full border-collapse border-black">
-              <thead>
-                <tr className="bg-[#004D9F]">
-                  <th className="px-4 py-3 text-left text-white font-medium border-b border-blue-500">Supplier ID รหัส Supplier</th>
-                  <th className="px-4 py-3 text-left text-white font-medium border-b border-blue-500">Supplier Name ชื่อ Supplier</th>
-                  <th className="px-4 py-3 text-left text-white font-medium border-b border-blue-500">Supplier Phone Number เบอร์โทร Supplier</th>
-                  <th className="px-4 py-3 text-left text-white font-medium border-b border-blue-500">Supplier Email อีเมล Supplier</th>
-                  <th className="px-4 py-3 text-left text-white font-medium border-b border-blue-500">Supplier Address ที่อยู่ Supplier</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredSupplier.map((supplier) => (
-                  <tr key={supplier.supplierId} className="border-b hover:bg-gray-50">
-                    <td className="px-4 py-3 text-gray-900">
-                      <Link 
-                        href={`/element/supplier/history_order/${supplier.supplierId}`}
-                        className="text-blue-600 hover:text-blue-800 hover:underline"
-                        >
-                      {supplier.supplierId}
-                      </Link>
-                    </td>
-                    <td className="px-4 py-3 text-gray-600">{supplier.supplierName}</td>
-                    <td className="px-4 py-3 text-gray-600">{supplier.supplierPhoneNumber}</td>
-                    <td className="px-4 py-3 text-gray-600">{supplier.supplierEmail}</td>
-                    <td className="px-4 py-3 text-gray-600">{supplier.supplierAddress}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="px-1 sm:px-2 md:px-6 ">
+            <div className="overflow-x-auto -mx-3 sm:-mx-4 md:-mx-6 overflow-hidden border border-gray-200 rounded-lg shadow-sm">
+              <div className="inline-block min-w-full align-middle">
+                <table className="min-w-full border-collapse border-black">
+                  <thead>
+                    <tr className="bg-[#004D9F]">
+                      <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-white text-xs sm:text-sm font-medium border-b border-blue-500">Supplier ID รหัส Supplier</th>
+                      <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-white text-xs sm:text-sm font-medium border-b border-blue-500">Supplier Name ชื่อ Supplier</th>
+                      <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-white text-xs sm:text-sm font-medium border-b border-blue-500">Supplier Phone Number เบอร์โทร Supplier</th>
+                      <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-white text-xs sm:text-sm font-medium border-b border-blue-500">Supplier Email อีเมล Supplier</th>
+                      <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-white text-xs sm:text-sm font-medium border-b border-blue-500">Supplier Address ที่อยู่ Supplier</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredSupplier.map((supplier) => (
+                      <tr key={supplier.supplierId} className="border-b hover:bg-gray-50">
+                        <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-gray-900">
+                          <Link 
+                            href={`/element/supplier/history_order/${supplier.supplierId}`}
+                            className="text-blue-600 hover:text-blue-800 hover:underline"
+                            >
+                          {supplier.supplierId}
+                          </Link>
+                        </td>
+                        <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-900">{supplier.supplierName}</td>
+                        <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-900">{supplier.supplierPhoneNumber}</td>
+                        <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-900">{supplier.supplierEmail}</td>
+                        <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-900">{supplier.supplierAddress}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
         </div>
       </main>

@@ -28,23 +28,23 @@ export function Navbar() {
       isScrolled ? 'bg-white shadow-lg' : 'bg-white'
     }`}>
       <div className='navbar-shadow'>
-      <div className="max-w-7xl mx-auto px-4">
-        <div className="flex justify-between items-center h-16">
+      <div className="max-w-7xl mx-auto px-1">
+        <div className="flex h-20 items-center">
           {/* Logo */}
-          <div className="flex items-center">
-            <Link href="/home" className="flex items-center">
+          <div className="flex-shrink-0">
+            <Link href="/home" >
               <Image 
                 src={logo}
                 alt="Logo"
-                width={150}
-                height={150}
-                className="object-contain h-12"
+                width={70}
+                height={70}
+                className="w-auto h-auto"
               />
             </Link>
           </div>
 
           {/* Navigation Links - Hidden on mobile */}
-          <div className="hidden md:flex items-center space-x-12">
+          <div className="hidden md:flex items-center space-x-8">
             <Link href="/home" className="nav-link">หน้าหลัก</Link>
             <Link href="/about" className="nav-link">เกี่ยวกับเรา</Link>
             <Link href="/service" className="nav-link">บริการของเรา</Link>
@@ -52,8 +52,8 @@ export function Navbar() {
           </div>
 
           {/* Right Side Icons */}
-          <div className="flex items-center space-x-4">
-            <a href='/notification' className="bell-icon">
+          <div className="hidden md:flex items-center ml-auto space-x-4">
+            <a href='/notification' className="p-2">
               <Image
                 src={bell}
                 alt='bell'
@@ -62,7 +62,7 @@ export function Navbar() {
               />
             </a>
             
-            <a href='/profile' className="hamburger-icon">
+            <a href='/profile' className="p-2">
               <Image
                 src={hamburger}
                 alt='hamburger'

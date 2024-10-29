@@ -99,8 +99,8 @@ export default function CustomerDetailPage() {
     return (
         <div className="min-h-screen bg-gray-50">
         <Navbar />
-        <main className="max-w-5xl mx-auto px-1 py-6">
-            <div className="bg-white rounded-xl shadow-xl p-6">
+        <main className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-6 pt-14 sm:pt-16 md:pt-20">
+            <div className="bg-white rounded-lg shadow p-3 sm:p-4 md:p-12">
                 <Link href="/customer" className="inline-flex items-center text-[#004D9F] hover:underline">
                 <ChevronLeft className="w-4 h-4 mr-1" />
                 ย้อนกลับ

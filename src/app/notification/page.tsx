@@ -5,9 +5,9 @@ import NotificationFrame from '@/components/NotificationFrame';
 
 export default function NotificationPage() {
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col bg-white">
       <Navbar />
-      <div className="notification-container">
+      <div className="notification-container ">
         <h1 className="notification-header">แจ้งเตือน</h1>
         <NotificationFrame 
           timeAgo="2 เดือนที่แล้ว"

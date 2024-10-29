@@ -11,52 +11,62 @@ export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <nav className="navbar-shadow">
-      <div className="navbar-container flex items-center">
-        {/* Logo */}
-        <div className="flex-shrink-0 mr-20"> {/* เพิ่ม margin-right */}
-          <Link href="/home" className="flex items-center">
-            <Image 
-              src={logo}
-              alt="Logo"
-              width={150}
-              height={150}
-              className="logo-image"
-            />
-          </Link>
-        </div>
-
-        {/* Navigation Links - ย้ายมาชิดซ้ายและจัดกลุ่มใหม่ */}
-        <div className="flex items-center space-x-10"> {/* ใช้ space-x-6 สำหรับระยะห่างระหว่างเมนู */}
-          <Link href="/order_list" className="nav-link">คำสั่งซื้อ</Link>
-          <Link href="/customer" className="nav-link">ลูกค้า</Link>
-          <Link href="/element" className="nav-link">ชิ้นส่วนอุปกรณ์</Link>
-        </div>
-
-        {/* Right Side Icons - ย้ายไปทางขวาสุด */}
-        <div className="flex items-center ml-[600px]"> {/* ใช้ ml-auto เพื่อดัน icons ไปทางขวา */}
-          <div className='bell-icon'>
-            <a href='/notification'>
-              <button className='p-2'>
-                <Image
-                  src={bell}
-                  alt='bell'
-                  width={25}
-                  height={25}
-                />
-              </button>
-            </a>
+    <nav className="bg-white shadow-md">
+      <div className="max-w-7xl mx-auto px-1"> {/* เพิ่ม padding ด้านข้าง */}
+        <div className="flex h-20 items-center">
+          {/* Logo */}
+          <div className="flex-shrink-0">
+            <Link href="/home">
+              <Image 
+                src={logo}
+                alt="Logo"
+                width={70}  
+                height={70}
+                className="w-auto h-auto"
+              />
+            </Link>
           </div>
 
-          <div className='hamburger-icon'>
-            <a href='/profile' className="p-2" >
+          {/* Navigation Links */}
+          <div className="hidden md:flex ml-16 space-x-8"> {/* ปรับระยะห่างจาก logo และระหว่างเมนู */}
+            <Link 
+              href="/order_list" 
+              className="nav-link"
+            >
+              คำสั่งซื้อ
+            </Link>
+            <Link 
+              href="/customer" 
+              className="nav-link"
+            >
+              ลูกค้า
+            </Link>
+            <Link 
+              href="/element" 
+              className="nav-link" 
+            >
+              ชิ้นส่วนอุปกรณ์
+            </Link>
+          </div>
+
+          {/* Right Side Icons */}
+          <div className="hidden md:flex items-center ml-auto space-x-4"> {/* ใช้ ml-auto เพื่อดันไปทางขวาสุด */}
+            <Link href="/notification" className="p-2">
+              <Image
+                src={bell}
+                alt="bell"
+                width={22}  
+                height={22}
+              />
+            </Link>
+            <Link href="/profile" className="p-2">
               <Image
                 src={hamburger}
-                alt='hamburger'
-                width={25}
-                height={25}
+                alt="hamburger"
+                width={22} 
+                height={22}
               />
-            </a>
+            </Link>
           </div>
         </div>
       </div>
@@ -64,15 +74,15 @@ export function Navbar() {
   );
 }
 
-export default function AdminLayout({ 
-  children 
-}: { 
-  children: React.ReactNode 
-}) {
+interface AdminLayoutProps {
+  children: React.ReactNode;
+}
+
+export default function AdminLayout({ children }: AdminLayoutProps) {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
-      <main>
+      <main className="pt-16">
         {children}
       </main>
     </div>

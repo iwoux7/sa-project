@@ -15,7 +15,7 @@ const HomePage = () => {
         {/* Hero Section */}
         
         <section className="hero-section">
-        <div className="hero-background">
+        <div className="hero-background ">
           <Image
             src={solar}
             alt="Solar Panels"
@@ -30,12 +30,12 @@ const HomePage = () => {
           
           <div className="hero-buttons">
             <a href="/contact">
-              <button className="hero-button-primary">
+              <button className="buttonemerald">
                 <b>ติดต่อเรา</b>
               </button>
             </a>
             <a href="/service">
-              <button className="hero-button-secondary">
+              <button className="buttonyellow">
                 <b>ทดลองประเมินราคาเบื้องต้น</b>
               </button>
             </a>

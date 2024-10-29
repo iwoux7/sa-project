@@ -147,22 +147,22 @@ export default function ServicePage() {
   };
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col bg-white">
       <Navbar />
       <section id="service" className='service-card'>
         <div className="container mx-auto">
-          <h2 className="text-2xl font-bold mb-8 text-center">
+          <h2 style={{ color: '#004D9F' }} className="text-2xl font-bold mb-8 text-center">
             คำนวณเพื่อหาผลิตภัณฑ์ที่เหมาะสมสำหรับคุณ
           </h2>
           <div className="max-w-md mx-auto bg-white p-6 rounded-lg shadow-md">
             <form onSubmit={handleSubmit}>
               <div className="mb-4">
-                <label className="block text-sm font-medium mb-1">
+                <label className="block text-sm font-medium mb-1 text-black">
                   ค่าไฟฟ้าต่อเดือน (บาท)
                 </label>
                 <input
                   type="number"
-                  className={`login-input ${errors.ElectricityBill ? 'border-red-500' : ''}`}
+                  className={`login-input ${errors.ElectricityBill ? 'border-red-500' : 'text-black placeholder-gray-500'}`}
                   placeholder="ค่าไฟฟ้าต่อเดือน"
                   value={formData.ElectricityBill}
                   onChange={(e) => {
@@ -178,12 +178,12 @@ export default function ServicePage() {
               </div>
 
               <div className="mb-4">
-                <label className="block text-sm font-medium mb-1">
+                <label className="block text-sm font-medium mb-1 text-black">
                   เปอร์เซ็นต์การใช้ไฟฟ้าในช่วง 9:00 - 22:00 น.
                 </label>
                 <input
                   type="number"
-                  className={`login-input ${errors.userate ? 'border-red-500' : ''}`}
+                  className= {`login-input ${errors.userate ? 'border-red-500 ' : 'text-black placeholder-gray-500'}`}
                   placeholder="เปอร์เซ็นต์การใช้ไฟฟ้าในช่วง 9:00 - 22:00 น."
                   value={formData.userate}
                   onChange={(e) => {
@@ -201,14 +201,14 @@ export default function ServicePage() {
               <div className='button-container-green'>
                 <button
                   type="submit"
-                  className="green-button">
+                  className="buttonemerald">
                   คำนวณ
                 </button>
               </div>
             </form>
 
             {results && (
-              <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+              <div className="mt-6 p-4 bg-gray-50 rounded-lg text-black">
                 <div className="mb-4 p-3 bg-blue-50 rounded">
                   <h3 className="font-medium mb-2">คำแนะนำโซลูชัน:</h3>
                   <p className="text-blue-800 font-medium">

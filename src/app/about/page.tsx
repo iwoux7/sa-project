@@ -25,12 +25,12 @@ export default function About() {
                         
                         <div className="hero-buttons">
                             <a href="/contact">
-                                <button className="hero-button-primary">
+                                <button className="buttonemerald">
                                     <b>ติดต่อเรา</b>
                                 </button>
                             </a>
                             <a href="/service">
-                                <button className="hero-button-secondary">
+                                <button className="buttonyellow">
                                     <b>ทดลองประเมินราคาเบื้องต้น</b>
                                 </button>
                             </a>

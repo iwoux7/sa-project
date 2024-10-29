@@ -88,7 +88,7 @@ export const AddSupplierDialog: React.FC<AddSupplierDialogProps> = ({
       <DialogContent className="sm:max-w-xl bg-white">
         <DialogHeader>
           <DialogTitle className="text-2xl font-semibold text-center text-[#004D9F]">
-            เพิ่มชิ้นส่วนอุปกรณ์
+            เพิ่มข้อมูล Supplier
           </DialogTitle>
         </DialogHeader>
         <div className="space-y-2">

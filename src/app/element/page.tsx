@@ -52,7 +52,7 @@ const ElementList = () => {
     setShowConfirmDialog(true);
   };
 
-  const handleReset = () => {
+    const handleReset = () => {
     setFormData({
       supplierId: "",
       elementName: "",
@@ -77,8 +77,8 @@ const ElementList = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
-      <main className="max-w-7xl mx-auto px-1 py-6">
-        <div className="bg-white rounded-lg shadow p-6">
+      <main className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-6 pt-14 sm:pt-16 md:pt-20">
+        <div className="bg-white rounded-lg shadow p-3 sm:p-4 md:p-12">
           <h1 style={{ color: '#004D9F' }} className="text-3xl font-semibold text-center mb-6">
             รายชื่อชิ้นส่วน
           </h1>
@@ -113,27 +113,31 @@ const ElementList = () => {
           </div>
 
           {/* Table */}
-          <div className="overflow-x-auto">
-            <table className="min-w-full border-collapse border-black">
-              <thead>
-                <tr className="bg-[#004D9F]">
-                  <th className="px-4 py-3 text-left text-white font-medium border-b border-blue-500">Element ID รหัสชิ้นส่วน</th>
-                  <th className="px-4 py-3 text-left text-white font-medium border-b border-blue-500">Element Name ชื่อชิ้นส่วน</th>
-                  <th className="px-4 py-3 text-left text-white font-medium border-b border-blue-500">Element Detail รายละเอียดชิ้นส่วน</th>
-                  <th className="px-4 py-3 text-left text-white font-medium border-b border-blue-500">Unit Price ราคาต่อหน่วย</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredElement.map((elements) => (
-                  <tr key={elements.elementId} className="border-b hover:bg-gray-50">
-                    <td className="px-4 py-3 font-medium text-gray-900">{elements.elementId}</td>
-                    <td className="px-4 py-3 font-medium text-gray-600">{elements.elementName}</td>
-                    <td className="px-4 py-3 text-gray-600">{elements.elementDetail}</td>
-                    <td className="px-4 py-3 text-gray-600">{elements.unitPrice}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="px-1 sm:px-2 md:px-6 ">
+            <div className="overflow-x-auto -mx-3 sm:-mx-4 md:-mx-6 overflow-hidden border border-gray-200 rounded-lg shadow-sm">
+              <div className="inline-block min-w-full align-middle">
+                <table className="min-w-full border-collapse border-black">
+                  <thead>
+                    <tr className="bg-[#004D9F]">
+                      <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-white text-xs sm:text-sm font-medium border-b border-blue-500">Element ID รหัสชิ้นส่วน</th>
+                      <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-white text-xs sm:text-sm font-medium border-b border-blue-500">Element Name ชื่อชิ้นส่วน</th>
+                      <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-white text-xs sm:text-sm font-medium border-b border-blue-500">Element Detail รายละเอียดชิ้นส่วน</th>
+                      <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-white text-xs sm:text-sm font-medium border-b border-blue-500">Unit Price ราคาต่อหน่วย</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredElement.map((elements) => (
+                      <tr key={elements.elementId} className="border-b hover:bg-gray-50">
+                        <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-900">{elements.elementId}</td>
+                        <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-900">{elements.elementName}</td>
+                        <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-900">{elements.elementDetail}</td>
+                        <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-900">{elements.unitPrice}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>          
+            </div>
           </div>
         </div>
       </main>

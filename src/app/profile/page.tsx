@@ -28,7 +28,12 @@ export default function ProfilePage() {
     },
   ];
 
-  const handleSubmit = (newData) => {
+  const handleSubmit = (newData: {
+    name: string;
+    phone: string;
+    email: string;
+    address: string;
+  }) => {
     setFormData(newData);
     setShowEditModal(false);
     setShowConfirmModal(true);
@@ -40,7 +45,7 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col bg-gray-50">
       <Navbar />
       <div className="profile-container">
         <div className="profile-header">
@@ -115,7 +120,7 @@ export default function ProfilePage() {
                   </button>
                 </div>
                 
-                <div className="grid grid-cols-2 gap-4 text-l">
+                <div className="grid grid-cols-2 gap-4 text-l text-black">
                   <div>
                     <p><span className="text-lg"><b>ประเภทของผลิตภัณฑ์:</b></span> {order.product}</p>
                     <p><span className="text-lg"><b>วันที่สั่งซื้อ:</b></span> {order.orderDate}</p>
