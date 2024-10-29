@@ -99,7 +99,7 @@ const SupplierList = () => {
                 ย้อนกลับ
                 </Link>
           <h1 style={{ color: '#004D9F' }} className="text-3xl font-semibold text-center mb-6">
-            รายชื่อ Suplier
+            รายชื่อ Supplier
           </h1>
 
           {/* Search and Buttons */}
