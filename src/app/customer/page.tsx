@@ -100,7 +100,7 @@ export default function CustomerList  () {
                         <td className="px-4 py-3 text-gray-600">{customer.customerEmail}</td>
                         <td className="px-4 py-3 text-gray-600">{customer.customerEmail}</td>
                         <td className="px-4 py-3"> {customer.customerStatus && (
-                            <span className="bg-yellow-300 px-4 py-1 rounded text-black">
+                            <span className="bg-yellow-300 px-2 py-1 rounded text-black whitespace-nowrap">
                             {customer.customerStatus}
                         </span>
                         )}
