@@ -2,15 +2,59 @@
 import { useState } from 'react';
 import Link from 'next/link';
 
+interface FormData {
+  email: string;
+  password: string;
+}
+
+interface FormErrors {
+  email?: string;
+  password?: string;
+}
+
 export default function LoginPage() {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     email: '',
     password: ''
   });
 
+  const [errors, setErrors] = useState<FormErrors>({});
+
+  const validateForm = (): boolean => {
+    const newErrors: FormErrors = {};
+
+    // Validate Email
+    if (!formData.email) {
+      newErrors.email = 'กรุณากรอกอีเมล';
+    } else if (!/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(formData.email)) {
+      newErrors.email = 'กรุณากรอกอีเมลให้ถูกต้อง';
+    }
+
+    // Validate Password
+    if (!formData.password) {
+      newErrors.password = 'กรุณากรอกรหัสผ่าน';
+    } else if (formData.password.length < 6) {
+      newErrors.password = 'รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleChange = (field: keyof FormData, value: string) => {
+    setFormData(prev => ({...prev, [field]: value}));
+    // Clear error when user starts typing
+    if (errors[field]) {
+      setErrors(prev => ({...prev, [field]: undefined}));
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Login:', formData);
+    if (validateForm()) {
+      console.log('Login:', formData);
+      // Proceed with login
+    }
   };
 
   return (
@@ -20,38 +64,44 @@ export default function LoginPage() {
         
         <form onSubmit={handleSubmit}>
           <div>
-            <label>อีเมล</label><label style={{ color: '#FF0000' }}>*</label>
+            <label>อีเมล<span style={{ color: '#FF0000' }}>*</span></label>
             <input
-              type="enail"
+              type="email"
               placeholder="อีเมล"
-              className="login-input"
+              className={`login-input ${errors.email ? 'border-red-500' : ''}`}
               value={formData.email}
-              onChange={(e) => setFormData({...formData, email: e.target.value})}
+              onChange={(e) => handleChange('email', e.target.value)}
             />
+            {errors.email && (
+              <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+            )}
           </div>
 
-          <div>
-            <label>รหัสผ่าน</label><label style={{ color: '#FF0000' }}>*</label>
+          <div className='mt-2 mb-2'>
+            <label>รหัสผ่าน<span style={{ color: '#FF0000' }}>*</span></label>
             <input
               type="password"
               placeholder="รหัสผ่าน"
-              className="login-input"
+              className={`login-input ${errors.password ? 'border-red-500' : ''}`}
               value={formData.password}
-              onChange={(e) => setFormData({...formData, password: e.target.value})}
+              onChange={(e) => handleChange('password', e.target.value)}
             />
+            {errors.password && (
+              <p className="text-red-500 text-sm mt-1">{errors.password}</p>
+            )}
           </div>
 
           <div className="button-container-login">
-            <a href='/home' className="button">
+            <button type="submit" className="button">
               เข้าสู่ระบบ
-            </a>
+            </button>
           </div>
 
           <div className="text-center mt-4">
-            <a>ไม่เคยมีบัญชีกับเรามาก่อน? </a> 
-            <a href="/register" className="no-account">
-             <u>ลงทะเบียนที่นี่</u>
-            </a>
+            <span>ไม่เคยมีบัญชีกับเรามาก่อน? </span> 
+            <Link href="/register" className="no-account">
+              <u>ลงทะเบียนที่นี่</u>
+            </Link>
           </div>
         </form>
       </div>
