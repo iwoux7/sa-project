@@ -139,7 +139,7 @@ export default function CustomerDetailPage() {
                         </div>
                         <div>
                             <div className="flex items-baseline gap-5">
-                                <div className="text-lg text-black">ที่อยู่</div>
+                                <div className="text-lg text-black whitespace-nowrap">ที่อยู่</div>
                                 <div className="text-black ">{customerData.customerAddress}</div>
                             </div>
                         </div>
