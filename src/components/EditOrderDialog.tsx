@@ -1,11 +1,13 @@
 'use client';
-import React, { useEffect } from 'react';
+import React, { useEffect , useState } from 'react';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { ConfirmEditOrderDialog } from './ConfirmEditOrderDialog';
+import { SuccessEditOrderDialog } from './SuccessEditOrderDialog';
 import CustomPopupMenu from './CustomPopupMenu';
 
 // กำหนด interface สำหรับข้อมูล
@@ -76,10 +78,25 @@ export default function EditOrderDialog({
     }));
   };
 
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+
   const inputStyles = "w-full px-3 py-2 border border-gray-300 rounded bg-white";
   const labelStyles = "w-40 text-right whitespace-nowrap";
 
+  const handleSubmitClick = () => {
+    setShowConfirmDialog(true);
+    onSave(formData);
+  };
+
+  const handleConfirm = () => {
+    setShowConfirmDialog(false);
+    setShowSuccessDialog(true);
+    onOpenChange(false)
+  };
+
   return (
+    <>
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl p-6 bg-white text-black">
         <DialogHeader>
@@ -199,10 +216,7 @@ export default function EditOrderDialog({
 
           <div className="flex justify-center mt-6">
             <button
-              onClick={() => {
-                onSave(formData);
-                onOpenChange(false);
-              }}
+              onClick={handleSubmitClick}
               className="buttonemerald"
             >
               แก้ไขคำสั่งซื้อ
@@ -211,5 +225,15 @@ export default function EditOrderDialog({
         </div>
       </DialogContent>
     </Dialog>
+    <ConfirmEditOrderDialog
+      open={showConfirmDialog}
+      onOpenChange={setShowConfirmDialog}
+      onConfirm={handleConfirm}
+    />
+    <SuccessEditOrderDialog
+      open={showSuccessDialog}
+      onOpenChange={setShowSuccessDialog}
+    />
+    </>
   );
 }

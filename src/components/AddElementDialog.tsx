@@ -8,8 +8,19 @@ import {
   DialogTrigger,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { ConfirmDialog } from './ConfirmDialog';
+import { SuccessElementDialog } from './SuccessElementDialog';
 import { Button } from "@/components/ui/button";
 import { Plus } from 'lucide-react';
+
+
+interface ElementData {
+  elementId: string;
+  supplierId: string;
+  elementName: string;
+  elementDetail: string;
+  unitPrice: string;
+}
 
 interface AddElementDialogProps {
   formData: {
@@ -18,7 +29,10 @@ interface AddElementDialogProps {
     elementDetail: string;
     unitPrice: string;
   };
+  open: boolean;
   onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onOpenChange: (open: boolean) => void;
+  onAdd: (newOrder: any) => void;
   onSubmit: () => void;
   onReset: () => void;  // เพิ่ม prop นี้
 }
@@ -26,6 +40,9 @@ interface AddElementDialogProps {
 export const AddElementDialog: React.FC<AddElementDialogProps> = ({
   formData,
   onInputChange,
+  open,
+  onOpenChange,
+  onAdd,
   onSubmit,
   onReset,
 }) => {
@@ -33,6 +50,9 @@ export const AddElementDialog: React.FC<AddElementDialogProps> = ({
     elementId: false,
     elementName: false
   });
+
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
 
   // เพิ่มฟังก์ชันสำหรับจัดการเมื่อ Dialog เปิด/ปิด
   const handleOpenChange = (open: boolean) => {
@@ -71,10 +91,25 @@ export const AddElementDialog: React.FC<AddElementDialogProps> = ({
 
     if (!newErrors.elementId && !newErrors.elementName) {
       onSubmit();
+      setShowConfirmDialog(true)
     }
   };
+  const handleConfirm = () => {
+    const newOrder: ElementData = {
+      ...formData,
+      elementId: `ELM${Math.floor(Math.random() * 1000)}`,
+    };
+    
+    onAdd(newOrder);
+    setShowConfirmDialog(false);
+    setShowSuccessDialog(true);
+    onOpenChange(false)
+  };
+
+
 
   return (
+    <>
     <Dialog onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button variant="default" size="icon" className="border-[1.5px] border-black bg-emerald-500 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] rounded-full">
@@ -159,5 +194,15 @@ export const AddElementDialog: React.FC<AddElementDialogProps> = ({
         </DialogFooter>
       </DialogContent>
     </Dialog>
+    <ConfirmDialog
+      open={showConfirmDialog}
+      onOpenChange={setShowConfirmDialog}
+      onConfirm={handleConfirm}
+    />
+    <SuccessElementDialog
+      open={showSuccessDialog}
+      onOpenChange={setShowSuccessDialog}
+    />
+    </>
   );
 };

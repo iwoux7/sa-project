@@ -2,25 +2,10 @@
 import React, { useState } from 'react';
 import { Navbar } from '@/layouts/AdminNavbar';
 import { Search } from 'lucide-react';
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { AddElementDialog } from '@/components/AddElementDialog';
-import { SuccessElementDialog } from '@/components/SuccessElementDialog';
-import { ConfirmDialog } from '@/components/ConfirmDialog';
 import Link from 'next/link';
 
-const ElementList = () => {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
-  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
-  const [formData, setFormData] = useState({
-    supplierId: '',
-    elementName: '',
-    elementDetail: '',
-    unitPrice: ''
-  });
-
-  const elements = [
+  const element = [
     {
       elementId: 'ELM001',
       elementName: 'Tongwei solar Mono 405W Full-black Tier-1',
@@ -34,6 +19,28 @@ const ElementList = () => {
       unitPrice: 'x,xxx',
     }
   ];
+
+const ElementList = () => {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+  const [isAddElementDialogOpen, setIsAddElementDialogOpen] = useState(false)
+  const [elements, setElements] = useState(element);
+  const [formData, setFormData] = useState({
+    supplierId: '',
+    elementName: '',
+    elementDetail: '',
+    unitPrice: ''
+  });
+
+
+  interface ElementData {
+    elementId: string;
+    supplierId: string;
+    elementName: string;
+    elementDetail: string;
+    unitPrice: string;
+  }
 
   const filteredElement = elements.filter(elements =>
     elements.elementId.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -73,6 +80,10 @@ const ElementList = () => {
       unitPrice: ''
     });
   };
+  const handleAddOrder = (newElement: ElementData) => {
+    setElements(prevElements => [newElement, ...prevElements]);
+    setIsAddElementDialogOpen(false); // ปิด dialog หลังจากเพิ่มข้อมูล
+};
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -102,13 +113,18 @@ const ElementList = () => {
             <AddElementDialog 
               formData={formData}
               onInputChange={handleInputChange}
+              open={isAddElementDialogOpen}
+              onAdd={handleAddOrder}
+              onOpenChange={setIsAddElementDialogOpen}
               onSubmit={handleShowConfirm}
               onReset={handleReset}
             />
             <Link href={`/element/supplier`}>
-                <Button variant="default" className="buttonemerald">
+                <button 
+                onClick={handleShowConfirm}
+                className="buttonemerald">
                 Suppliers
-                </Button>
+                </button>
             </Link>
           </div>
 
@@ -141,16 +157,6 @@ const ElementList = () => {
           </div>
         </div>
       </main>
-
-      <ConfirmDialog
-        open={showConfirmDialog}
-        onOpenChange={setShowConfirmDialog}
-        onConfirm={handleConfirm}
-      />
-      <SuccessElementDialog
-        open={showSuccessDialog}
-        onOpenChange={setShowSuccessDialog}
-      />
     </div>
   );
 };

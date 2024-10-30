@@ -72,24 +72,37 @@
 
 
     export default function OrderTrackingPage() {
-    const [searchQuery, setSearchQuery] = useState('');
-    const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-    const [orders, setOrders] = useState(mockOrders); // ใช้ state แทน mockOrders ตรงๆ
+        const [searchQuery, setSearchQuery] = useState('');
+        const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+        const [orders, setOrders] = useState(mockOrders);
     
-
-    // ฟังก์ชันสำหรับค้นหาข้อมูล
-    const filteredOrders = mockOrders.filter(order => 
-        order.orderId.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        order.customerId.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        order.orderDetail.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        order.quotationNo.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        order.orderPrice.includes(searchQuery) || // เพิ่มการค้นหาจากราคา
-        order.orderProcess.toLowerCase().includes(searchQuery.toLowerCase()) // เพิ่มการค้นหาจากสถานะ
-    );
-
-    const handleAddOrder = (newOrder: any) => {
-        setOrders(prevOrders => [newOrder, ...prevOrders]);
-    };
+        const filteredOrders = orders.filter(order =>  // เปลี่ยนจาก mockOrders เป็น orders
+            order.orderId.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            order.customerId.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            order.orderDetail.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            order.quotationNo.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            order.orderPrice.includes(searchQuery) ||
+            order.orderProcess.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+    
+        // เพิ่ม type ให้กับ parameter
+        interface OrderData {
+            orderId: string;
+            orderDate: string;
+            customerId: string;
+            orderDetail: string;
+            expectedDate: string;
+            finishedDate: string;
+            orderPrice: string;
+            orderProcess: string;
+            paymentStatus: string;
+            quotationNo: string;
+        }
+    
+        const handleAddOrder = (newOrder: OrderData) => {
+            setOrders(prevOrders => [newOrder, ...prevOrders]);
+            setIsAddDialogOpen(false); // ปิด dialog หลังจากเพิ่มข้อมูล
+        };
 
     // สถานะต่างๆ สำหรับ badge
     const getStatusColor = (status: string) => {
@@ -170,12 +183,25 @@
                                         {filteredOrders.map((order) => (
                                             <tr key={order.orderId} className="border-b hover:bg-gray-50">
                                                 <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-gray-900">
-                                                    <Link 
-                                                        href={`/order_detail/${order.orderId}`}
-                                                        className="text-blue-600 hover:text-blue-800 hover:underline"
-                                                    >
-                                                        {order.orderId}
-                                                    </Link>
+                                                <Link 
+                                                href={{
+                                                    pathname: `/order_detail/${order.orderId}`,
+                                                    query: {
+                                                    orderDate: order.orderDate,
+                                                    customerId: order.customerId,
+                                                    orderDetail: order.orderDetail,
+                                                    expectedDate: order.expectedDate,
+                                                    finishedDate: order.finishedDate,
+                                                    orderPrice: order.orderPrice,
+                                                    orderProcess: order.orderProcess,
+                                                    paymentStatus: order.paymentStatus,
+                                                    quotationNo: order.quotationNo
+                                                    }
+                                                }}
+                                                className="text-blue-600 hover:text-blue-800 hover:underline"
+                                                >
+                                                {order.orderId}
+                                                </Link>
                                                 </td>
                                                 <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-600">{order.orderDate}</td>
                                                 <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-600">{order.customerId}</td>

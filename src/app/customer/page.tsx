@@ -39,7 +39,7 @@ export default function CustomerList  () {
         <div className="min-h-screen bg-gray-50">
         <Navbar />
         <main className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-6 pt-14 sm:pt-16 md:pt-20">
-            <div className="bg-white rounded-lg shadow p-3 sm:p-4 md:p-12">
+            <div className="bg-white rounded-lg shadow p-6">
             <h1 style={{ color: '#004D9F' }} className="text-xl sm:text-2xl lg:text-3xl font-semibold text-center mb-4 sm:mb-6">
                 รายชื่อลูกค้า
             </h1>
