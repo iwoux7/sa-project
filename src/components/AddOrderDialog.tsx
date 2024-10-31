@@ -11,24 +11,39 @@ import { SuccessAddOrderDialog } from './SuccessAddOrderDialog';
 import CustomPopupMenu from './CustomPopupMenu';
 
 interface OrderData {
-  orderId: string;
-  deviceType: string;
   orderDate: string;
   customerId: string;
   orderDetail: string;
-  expectedDate: string;
-  finishedDate: string;
+  expectedDate: string | null;
+  finishedDate: string | null;
   orderPrice: string;
   orderProcess: string;
   paymentStatus: string;
-  quotationNo: string;
+  deviceType: string;
+}
+
+interface QuotationData {
+  CO_NAME: string;
+  CO_ADDRESS: string;
+  CO_PHONE_NUMBER: string;
+  CO_EMAIL: string;
+  DEVICE_TYPE: string;
+  TOTAL_PRICE: number;
+  PAYMENT_TYPE: string;
+  REMARK?: string;
+}
+
+interface AddOrderResponse {
+  order: any;
+  quotation: any;
 }
 
 interface AddOrderDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onAdd: (newOrder: any) => void;
+  onAdd: (orderData: OrderData, quotationData: QuotationData) => Promise<AddOrderResponse>;
 }
+
 
 const deviceTypeOptions = [
   { value: 'มิเตอร์ไฟฟ้า TOU', label: 'มิเตอร์ไฟฟ้า TOU' },
@@ -37,79 +52,126 @@ const deviceTypeOptions = [
 ];
 
 const orderProcessOptions = [
-    { value: 'รอยืนยันการชำระเงิน', label: 'รอยืนยันการชำระเงิน' },
-    { value: 'ยืนยันการชำระเงิน', label: 'ยืนยันการชำระเงิน' },
-    { value: 'กำลังประกอบชิ้นงาน', label: 'กำลังประกอบชิ้นงาน' },
-    { value: 'ชิ้นงานประกอบเสร็จสิ้น', label: 'ชิ้นงานประกอบเสร็จสิ้น' },
-    { value: 'ยืนยันการชำระเงินครบถ้วน', label: 'ยืนยันการชำระเงินครบถ้วน' },
-    { value: 'ส่งมอบชิ้นงานเรียบร้อย', label: 'ส่งมอบชิ้นงานเรียบร้อย' },
+  { value: 'รอการตัดสินใจ', label: 'รอการตัดสินใจ' },
+  { value: 'กำลังประกอบชิ้นงาน', label: 'กำลังประกอบชิ้นงาน' },
+  { value: 'ชิ้นงานประกอบเสร็จสิ้น', label: 'ชิ้นงานประกอบเสร็จสิ้น' },
+  { value: 'ส่งมอบชิ้นงานเรียบร้อย', label: 'ส่งมอบชิ้นงานเรียบร้อย' },
+  { value: 'ยกเลิกคำสั่งซื้อ', label: 'ยกเลิกคำสั่งซื้อ' }
 ];
 
 const paymentStatusOptions = [
-  { value: 'รอการชำระเงิน', label: 'รอการชำระเงิน' },
-  { value: 'ชำระเงินแล้ว', label: 'ชำระเงินแล้ว' }
+  { value: 'รอชำระค่าชิ้นงานรอบแรก', label: 'รอชำระค่าชิ้นงานรอบแรก' },
+  { value: 'รอยืนยันการชำระเงิน', label: 'รอยืนยันการชำระเงิน' },
+  { value: 'ยืนยันการชำระเงินรอบแรก', label: 'ยืนยันการชำระเงินรอบแรก' },
+  { value: 'ยืนยันการชำระเงินครบถ้วน', label: 'ยืนยันการชำระเงินครบถ้วน' }
 ];
 
 export default function AddOrderDialog({ open, onOpenChange, onAdd }: AddOrderDialogProps) {
-  const [formData, setFormData] = useState<Omit<OrderData, 'orderId'>>({
-    deviceType: '',
+  const [formData, setFormData] = useState<OrderData>({
     orderDate: '',
     customerId: '',
     orderDetail: '',
-    expectedDate: '',
-    finishedDate: '',
+    expectedDate: null,
+    finishedDate: null,
     orderPrice: '',
-    orderProcess: 'รอดำเนินการทั้งหมด',
-    paymentStatus: 'รอการชำระเงิน',
-    quotationNo: ''
+    orderProcess: 'รอการตัดสินใจ',
+    paymentStatus: 'รอชำระค่าชิ้นงานรอบแรก',
+    deviceType: deviceTypeOptions[0].value
   });
 
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const inputStyles = "w-full px-3 py-2 border border-gray-300 rounded bg-white";
   const labelStyles = "w-40 text-right whitespace-nowrap";
 
-  const handleFieldChange = (field: string, value: string) => {
+  const validateForm = () => {
+    if (!formData.orderDate) {
+      setError('กรุณาระบุวันที่สั่งซื้อ');
+      return false;
+    }
+    if (!formData.customerId) {
+      setError('กรุณาระบุรหัสลูกค้า');
+      return false;
+    }
+    if (!formData.orderPrice) {
+      setError('กรุณาระบุราคาชิ้นงาน');
+      return false;
+    }
+    if (!formData.deviceType) {
+      setError('กรุณาระบุประเภทอุปกรณ์');
+      return false;
+    }
+    setError(null);
+    return true;
+  };
+
+  const handleFieldChange = (field: keyof OrderData, value: string) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
     }));
   };
 
-const handleSubmitClick = () => {
-    setShowConfirmDialog(true);
+  const handleSubmitClick = () => {
+    if (validateForm()) {
+      setShowConfirmDialog(true);
+    }
   };
 
-  const handleConfirm = () => {
-    const newOrder: OrderData = {
-      ...formData,
-      orderId: `SD${Math.floor(Math.random() * 1000)}`,
-    };
-    
-    onAdd(newOrder);
-    setShowConfirmDialog(false);
-    setShowSuccessDialog(true);
+  const handleConfirm = async () => {
+    try {
+      // สร้างข้อมูลสำหรับ Order - ส่งข้อมูลตามที่ API ต้องการ
+      const orderData = {
+        orderDate: formData.orderDate,
+        customerId: formData.customerId,
+        orderDetail: formData.orderDetail,
+        expectedDate: formData.expectedDate,
+        finishedDate: formData.finishedDate,
+        orderPrice: formData.orderPrice,
+        orderProcess: formData.orderProcess,
+        paymentStatus: formData.paymentStatus,
+        deviceType: formData.deviceType
+      };
+  
+      // สร้างข้อมูลสำหรับ Quotation
+      const quotationData = {
+        CO_NAME: 'Tech Lifestyle',
+        CO_ADDRESS: '248 ซ.พิบูลสงคราม 22 แขวงบางซื่อ เขตบางซื่อ กรุงเทพฯ 11000',
+        CO_PHONE_NUMBER: '0656217887',
+        CO_EMAIL: 'msnntb@gmail.com',
+        DEVICE_TYPE: formData.deviceType,
+        TOTAL_PRICE: parseFloat(formData.orderPrice),
+        PAYMENT_TYPE: 'โอนเงินทางธนาคาร'
+      };
+  
+      await onAdd(orderData, quotationData);
+      setShowConfirmDialog(false);
+      setShowSuccessDialog(true);
+  
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'เกิดข้อผิดพลาดในการบันทึกข้อมูล');
+      setShowConfirmDialog(false);
+    }
   };
+
 
   const handleSuccess = () => {
     setShowSuccessDialog(false);
     onOpenChange(false);
-    // รีเซ็ตฟอร์ม
     setFormData({
-      deviceType: '',
       orderDate: '',
       customerId: '',
       orderDetail: '',
-      expectedDate: '',
-      finishedDate: '',
+      expectedDate: null,
+      finishedDate: null,
       orderPrice: '',
-      orderProcess: 'รอดำเนินการทั้งหมด',
-      paymentStatus: 'รอการชำระเงิน',
-      quotationNo: ''
+      orderProcess: 'รอการตัดสินใจ',
+      paymentStatus: 'รอชำระค่าชิ้นงานรอบแรก',
+      deviceType: deviceTypeOptions[0].value
     });
   };
-
 
   return (
     <>
@@ -120,22 +182,14 @@ const handleSubmitClick = () => {
               เพิ่มคำสั่งซื้อ
             </DialogTitle>
           </DialogHeader>
-  
-          {/* Form Content */}
-          <div className="space-y-4 mt-6">
-            {/* ประเภทชิ้นงาน */}
-            <div className="flex items-center gap-3">
-              <label className={labelStyles}>ประเภทชิ้นงาน :</label>
-              <CustomPopupMenu
-                title="ประเภทชิ้นงาน"
-                value={formData.deviceType}
-                options={deviceTypeOptions}
-                onChange={(value) => handleFieldChange('deviceType', value)}
-                className={inputStyles}
-              />
+
+          {error && (
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded mb-4">
+              {error}
             </div>
-  
-            {/* วันที่ลูกค้าสั่ง และ รหัสลูกค้า */}
+          )}
+
+          <div className="space-y-4 mt-6">
             <div className="flex items-center gap-3">
               <label className={labelStyles}>วันที่ลูกค้าสั่ง :</label>
               <input
@@ -154,8 +208,18 @@ const handleSubmitClick = () => {
                 style={{ width: '200px' }}
               />
             </div>
-  
-            {/* รายละเอียดออเดอร์ */}
+
+            <div className="flex items-center gap-3">
+              <label className={labelStyles}>ประเภทอุปกรณ์ :</label>
+              <CustomPopupMenu
+                title="ประเภทอุปกรณ์"
+                value={formData.deviceType}
+                options={deviceTypeOptions}
+                onChange={(value) => handleFieldChange('deviceType', value)}
+                className={inputStyles}
+              />
+            </div>
+
             <div className="flex items-center gap-3">
               <label className={labelStyles}>รายละเอียดออเดอร์ :</label>
               <input
@@ -165,13 +229,12 @@ const handleSubmitClick = () => {
                 className={inputStyles}
               />
             </div>
-  
-            {/* วันที่คาดว่างานจะเสร็จ และ วันที่ชิ้นงานเสร็จสิ้น */}
+
             <div className="flex items-center gap-3">
               <label className={labelStyles}>วันที่คาดว่างานจะเสร็จ :</label>
               <input
                 type="date"
-                value={formData.expectedDate}
+                value={formData.expectedDate || ''}
                 onChange={(e) => handleFieldChange('expectedDate', e.target.value)}
                 className={inputStyles}
                 style={{ width: '200px' }}
@@ -179,26 +242,24 @@ const handleSubmitClick = () => {
               <label className={`${labelStyles} ml-4`}>วันที่ชิ้นงานเสร็จสิ้น :</label>
               <input
                 type="date"
-                value={formData.finishedDate}
+                value={formData.finishedDate || ''}
                 onChange={(e) => handleFieldChange('finishedDate', e.target.value)}
                 className={inputStyles}
                 style={{ width: '200px' }}
               />
             </div>
-  
-            {/* ราคาชิ้นงาน */}
+
             <div className="flex items-center gap-3">
               <label className={labelStyles}>ราคาชิ้นงาน :</label>
               <input
-                type="text"
+                type="number"
                 value={formData.orderPrice}
                 onChange={(e) => handleFieldChange('orderPrice', e.target.value)}
                 className={inputStyles}
                 style={{ width: '200px' }}
               />
             </div>
-  
-            {/* สถานะออเดอร์ และ สถานะการชำระเงิน */}
+
             <div className="flex items-center gap-3">
               <label className={labelStyles}>สถานะออเดอร์ :</label>
               <CustomPopupMenu
@@ -217,12 +278,11 @@ const handleSubmitClick = () => {
                 className={inputStyles}
               />
             </div>
-  
-            {/* ปุ่มบันทึก */}
+
             <div className="flex justify-center mt-6">
               <button
                 onClick={handleSubmitClick}
-                className="buttonemerald"
+                className="px-6 py-2 bg-emerald-500 text-white rounded hover:bg-emerald-600"
               >
                 เพิ่มคำสั่งซื้อ
               </button>
@@ -230,18 +290,22 @@ const handleSubmitClick = () => {
           </div>
         </DialogContent>
       </Dialog>
-  
-      <ConfirmAddOrderDialog
-        open={showConfirmDialog}
-        onOpenChange={setShowConfirmDialog}
-        onConfirm={handleConfirm}
-      />
-  
-      <SuccessAddOrderDialog
-        open={showSuccessDialog}
-        onOpenChange={setShowSuccessDialog}
-        onSuccess={handleSuccess}
-      />
+
+      {showConfirmDialog && (
+        <ConfirmAddOrderDialog
+          open={showConfirmDialog}
+          onOpenChange={setShowConfirmDialog}
+          onConfirm={handleConfirm}
+        />
+      )}
+
+      {showSuccessDialog && (
+        <SuccessAddOrderDialog
+          open={showSuccessDialog}
+          onOpenChange={setShowSuccessDialog}
+          onSuccess={handleSuccess}
+        />
+      )}
     </>
   );
 }

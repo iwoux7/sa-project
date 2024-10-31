@@ -40,19 +40,18 @@ const deviceTypes = [
 ];
 
 const orderStatuses = [
-  { value: 'รอยืนยันการชำระเงิน', label: 'รอยืนยันการชำระเงิน' },
-  { value: 'ยืนยันการชำระเงิน', label: 'ยืนยันการชำระเงิน' },
+  { value: 'รอการตัดสินใจ', label: 'รอการตัดสินใจ' },
   { value: 'กำลังประกอบชิ้นงาน', label: 'กำลังประกอบชิ้นงาน' },
   { value: 'ชิ้นงานประกอบเสร็จสิ้น', label: 'ชิ้นงานประกอบเสร็จสิ้น' },
-  { value: 'ยืนยันการชำระเงินครบถ้วน', label: 'ยืนยันการชำระเงินครบถ้วน' },
   { value: 'ส่งมอบชิ้นงานเรียบร้อย', label: 'ส่งมอบชิ้นงานเรียบร้อย' },
+  { value: 'ยกเลิกคำสั่งซื้อ', label: 'ยกเลิกคำสั่งซื้อ' }
 ];
 
-const paymentStatuses = [
-  { value: 'รอการชำระรอบแรก', label: 'รอการชำระรอบแรก' },
-  { value: 'ชำระเงินรอบแรก', label: 'ชำระเงินรอบแรก' },
-  { value: 'รอการชำระเงินรอบสุดท้าย', label: 'รอการชำระเงินรอบสุดท้าย' },
-  { value: 'ชำระเงินครบถ้วน', label: 'ชำระเงินครบถ้วน' },
+const paymentStatuses= [
+  { value: 'รอชำระค่าชิ้นงานรอบแรก', label: 'รอชำระค่าชิ้นงานรอบแรก' },
+  { value: 'รอยืนยันการชำระเงิน', label: 'รอยืนยันการชำระเงิน' },
+  { value: 'ยืนยันการชำระเงินรอบแรก', label: 'ยืนยันการชำระเงินรอบแรก' },
+  { value: 'ยืนยันการชำระเงินครบถ้วน', label: 'ยืนยันการชำระเงินครบถ้วน' }
 ];
 
 
@@ -64,12 +63,67 @@ export default function EditOrderDialog({
 }: EditOrderDialogProps) {
   // ใช้ initialData เป็นค่าเริ่มต้น
   const [formData, setFormData] = React.useState<OrderData>(initialData);
-
+  const deviceValues = deviceTypes.map(item => item.value);
+  
+  const formatDateForInput = (dateString: string | null) => {
+    if (!dateString) return '';
+    // ถ้าวันที่อยู่ในรูปแบบ dd/mm/yyyy ให้แปลงเป็น yyyy-mm-dd
+    if (dateString.includes('/')) {
+      const [day, month, year] = dateString.split('/');
+      return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+    }
+    // ถ้าเป็นวันที่ปกติให้ format ให้ถูกต้อง
+    return new Date(dateString).toISOString().split('T')[0];
+  };
   // ไม่จำเป็นต้องมี loading state แล้วเพราะได้ข้อมูลมาตั้งแต่ต้น
   useEffect(() => {
-    // อัพเดท formData เมื่อ initialData เปลี่ยน
-    setFormData(initialData);
-  }, [initialData]);
+    const updateData = async () => {
+      try {
+        const response = await fetch(`/api/orders/${initialData.orderId}`);
+        if (!response.ok) throw new Error('Failed to fetch order');
+        const data = await response.json();
+        console.log('Fetched data:', data);
+
+        setFormData({
+          orderId: data.ORDER_ID,
+          orderDate: formatDateForInput(data.ORDER_DATE),
+          customerId: data.CUSTOMER_ID,
+          orderDetail: data.ORDER_DETAIL || '',
+          expectedDate: formatDateForInput(data.EXPECTED_FINISH_DATE),
+          finishedDate: formatDateForInput(data.FINISHED_DATE),
+          orderPrice: data.ORDER_PRICE.toString(),
+          orderProcess: data.ORDER_PROCESS,
+          paymentStatus: data.PAYMENT_STATUS,
+          quotationNo: data.QUOTATION_NO || '',
+          deviceType: data.DEVICE_TYPE || deviceTypes[0].value // แก้จาก device_type เป็น DEVICE_TYPE
+        });
+      } catch (error) {
+        console.error('Error fetching order:', error);
+      }
+    };
+
+    const formatInitialDate = (dateString: string) => {
+      if (!dateString || dateString === 'N/A') return '';
+      // แปลงวันที่จาก dd/mm/yyyy เป็น yyyy-mm-dd
+      if (dateString.includes('/')) {
+        const [day, month, year] = dateString.split('/');
+        return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+      }
+      return dateString;
+    };
+
+    setFormData({
+      ...initialData,
+      orderDate: formatInitialDate(initialData.orderDate),
+      expectedDate: formatInitialDate(initialData.expectedDate),
+      finishedDate: formatInitialDate(initialData.finishedDate),
+    });
+
+    console.log('Initial data:', initialData);
+    if (initialData.orderId) {
+      updateData();
+    }
+  }, [initialData])
 
   const handleFieldChange = (field: keyof OrderData, value: string) => {
     setFormData(prev => ({
@@ -84,9 +138,40 @@ export default function EditOrderDialog({
   const inputStyles = "w-full px-3 py-2 border border-gray-300 rounded bg-white";
   const labelStyles = "w-40 text-right whitespace-nowrap";
 
-  const handleSubmitClick = () => {
-    setShowConfirmDialog(true);
-    onSave(formData);
+  const handleSubmitClick = async () => {
+    try {
+      const formatDateForAPI = (dateString: string) => {
+        if (!dateString) return null;
+        const date = new Date(dateString);
+        return date.toISOString().split('T')[0];
+      };
+
+      const formDataToSubmit = {
+        ...formData,
+        orderDate: formatDateForAPI(formData.orderDate),
+        expectedDate: formatDateForAPI(formData.expectedDate),
+        finishedDate: formatDateForAPI(formData.finishedDate),
+      };
+      
+      const response = await fetch(`/api/orders/${formData.orderId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to update order');
+      }
+  
+      const updatedOrder = await response.json();
+      setShowConfirmDialog(true);
+      onSave(updatedOrder);
+    } catch (error) {
+      console.error('Error:', error);
+      // Handle error (show error message to user)
+    }
   };
 
   const handleConfirm = () => {
@@ -107,17 +192,23 @@ export default function EditOrderDialog({
 
         {/* Form Content */}
         <div className="space-y-4 mt-6">
-          {/* ประเภทชิ้นงาน */}
-          <div className="flex items-center gap-3">
-            <label className={labelStyles}>ประเภทชิ้นงาน :</label>
-            <CustomPopupMenu
-              title="ประเภทชิ้นงาน"
-              value={formData.deviceType}
-              options={deviceTypes}
-              onChange={(value) => handleFieldChange('deviceType', value)}
-              className={inputStyles}
-            />
-          </div>
+        {/* ประเภทชิ้นงาน */}
+        <div className="flex items-center gap-3">
+          <label className={labelStyles}>ประเภทชิ้นงาน :</label>
+          <CustomPopupMenu
+            title="ประเภทชิ้นงาน"
+            value={formData.deviceType || deviceTypes[0].value} // เพิ่ม fallback value
+            options={deviceTypes}
+            onChange={(value) => handleFieldChange('deviceType', value)}
+            className={inputStyles}
+          />
+          {/* เพิ่ม debug info */}
+          {process.env.NODE_ENV === 'development' && (
+            <span className="text-xs text-gray-500">
+              (Current value: {formData.deviceType})
+            </span>
+          )}
+        </div>
 
           {/* วันที่ลูกค้าสั่ง และ รหัสลูกค้า */}
           <div className="flex items-center gap-3">

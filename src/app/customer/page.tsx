@@ -1,38 +1,41 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect} from 'react';
 import { Navbar } from '@/layouts/AdminNavbar';
 import Link from 'next/link';
 import { Search, Plus } from 'lucide-react';
 
 
+interface Customer{
+    CUSTOMER_ID: string,
+    CUSTOMER_NAME: string,
+    CUSTOMER_EMAIL: string,
+    CUSTOMER_PHONE_NUMBER: string,
+    CUSTOMER_ADDRESS: string,
+    CUSTOMER_STATUS: string,
+    CUSTOMER_QUESTION: string
+}
+
 export default function CustomerList  () {
     const [searchQuery, setSearchQuery] = useState('');
+    const [customers, setCustomers] = useState<Customer[]>([]);
   
-    const customers = [
-        {
-        customerId: 'CTM001',
-        customerName: 'อาทิตย์ สุริยจักรวาล',
-        customerPhone_Number: '023-456-7891',
-        customerEmail: 'solar_universe@gmail.com',
-        cusrtomerAddress: 'หมู่ 1 หมู่บ้านพระอาทิตย์ แขวงสุริยวงศ์ เขตบางรัก กทม. 10500',
-        customerStatus: 'รอการตอบกลับ',
-        customerQuestion: '-'
-        },
-    {
-        customerId: 'CTM002',
-        customerName: 'ชื่อ นามสกุล',
-        customerPhone_Number: '000-000-0000',
-        customerEmail: 'example@email',
-        cusrtomerAddress: 'หมู่ 2 หมู่บ้านพระอาทิตย์ แขวงสุริยวงศ์ เขตบางรัก กทม. 10500',
-        customerStatus: 'รอการตอบกลับ',
-        customerQuestion: 'สวัสดีครับ ขอสอบถาม'
-    }
-    ];
+    useEffect(() => {
+        const fetchCustomer = async () => {
+            try {
+                const response = await fetch('/api/customer');
+                const data = await response.json();
+                setCustomers(data);
+            } catch (error) {
+                console.error('Error fetching orders:', error);
+            }
+        };
+        fetchCustomer();
+    }, []);
 
     const filteredCustomers = customers.filter(customer =>
-        customer.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        customer.customerId.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        customer.customerEmail.toLowerCase().includes(searchQuery.toLowerCase())
+        customer.CUSTOMER_NAME.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        customer.CUSTOMER_ID.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        customer.CUSTOMER_EMAIL.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
     return (
@@ -78,36 +81,36 @@ export default function CustomerList  () {
                                 </thead>
                                 <tbody>
                                     {filteredCustomers.map((customer) => (
-                                    <tr key={customer.customerId} className="border-b hover:bg-gray-50">
+                                    <tr key={customer.CUSTOMER_ID} className="border-b hover:bg-gray-50">
                                         <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-gray-900">
                                         <Link 
-                                            href={{
-                                                pathname: `/customer/${customer.customerId}`,
-                                                query: {
-                                                customerName: customer.customerName,
-                                                customerPhone_Number: customer.customerPhone_Number,
-                                                customerEmail: customer.customerEmail,
-                                                customerAddress: customer.cusrtomerAddress,
-                                                customerStatus: customer.customerStatus,
-                                                customerQuestion: customer.customerQuestion
-                                                }
-                                            }}
-                                            className="text-[#004D9F] hover:text-[#004D9F] hover:underline"
-                                            >
-                                            {customer.customerId}
-                                            </Link>
+                                        href={{
+                                            pathname: `/customer/${customer.CUSTOMER_ID}`,
+                                            query: {
+                                            customerId: customer.CUSTOMER_ID,                                                customerName: customer.CUSTOMER_NAME,
+                                            customerPhone_Number: customer.CUSTOMER_PHONE_NUMBER,
+                                            customerEmail: customer.CUSTOMER_EMAIL,
+                                            customerAddress: customer.CUSTOMER_ADDRESS,
+                                            customerStatus: customer.CUSTOMER_STATUS,
+                                            customerQuestion: customer.CUSTOMER_QUESTION
+                                            }
+                                        }}
+                                        className="text-[#004D9F] hover:text-[#004D9F] hover:underline"
+                                        >
+                                        {customer.CUSTOMER_ID}
+                                        </Link>
                                         </td>
-                                        <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-900">{customer.customerName}</td>
-                                        <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-900">{customer.customerPhone_Number}</td>
-                                        <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-900">{customer.customerEmail}</td>
-                                        <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-900">{customer.customerEmail}</td>
-                                        <td className="px-2 sm:px-4 py-2 sm:py-3 "> {customer.customerStatus && (
+                                        <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-900">{customer.CUSTOMER_NAME}</td>
+                                        <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-900">{customer.CUSTOMER_PHONE_NUMBER}</td>
+                                        <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-900">{customer.CUSTOMER_EMAIL}</td>
+                                        <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-900">{customer.CUSTOMER_ADDRESS}</td>
+                                        <td className="px-2 sm:px-4 py-2 sm:py-3 "> {customer.CUSTOMER_STATUS && (
                                             <span className="px-2 sm:px-4 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm bg-yellow-100 text-yellow-800 whitespace-nowrap">
-                                            {customer.customerStatus}
+                                            {customer.CUSTOMER_STATUS}
                                         </span>
                                         )}
                                         </td>
-                                        <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-900">{customer.customerQuestion}</td>
+                                        <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-900">{customer.CUSTOMER_QUESTION}</td>
                                     </tr>
                                     ))}
                                 </tbody>

@@ -1,109 +1,119 @@
-    'use client';
-    import React, { useState } from 'react';
-    import { Navbar } from '@/layouts/AdminNavbar';
-    import Link from 'next/link';
-    import { Search, Plus } from 'lucide-react';
-    import AddOrderDialog from '@/components/AddOrderDialog';
+'use client';
+import React, { useState, useEffect } from 'react';
+import { Navbar } from '@/layouts/AdminNavbar';
+import Link from 'next/link';
+import { Search, Plus } from 'lucide-react';
+import AddOrderDialog from '@/components/AddOrderDialog';
+
+// เพิ่ม interface สำหรับ Order
+interface Order {
+  ORDER_ID: string;
+  ORDER_DATE: Date;
+  CUSTOMER_ID: string;
+  ORDER_DETAIL: string | null;
+  EXPECTED_FINISH_DATE: Date | null;
+  FINISHED_DATE: Date | null;
+  ORDER_PRICE: number;
+  ORDER_PROCESS: string | null;
+  PAYMENT_STATUS: string | null;
+  QUOTATION_NO: string | null;
+  DEVICE_TYPE: string | null;
+}
 
 
-    // Mock Data
-    const mockOrders = [
-    {
-        orderId: 'SD391',
-        orderDate: '15/10/2024',
-        customerId: 'CTM309',
-        orderDetail: 'มิเตอร์ไฟฟ้า 3 เฟส',
-        expectedDate: '20/10/2024',
-        finishedDate: 'N/A',
-        orderPrice: '45,000',
-        orderProcess: 'รอดำเนินการทั้งหมด',
-        paymentStatus: 'รอการชำระเงิน',
-        quotationNo: 'QTT002'
-    },
-    {
-        orderId: 'M7002',
-        orderDate: '13/10/2024',
-        customerId: 'CTM013',
-        orderDetail: 'มิเตอร์น้ำดิจิตอล',
-        expectedDate: '18/10/2024',
-        finishedDate: 'N/A',
-        orderPrice: '32,000',
-        orderProcess: 'รอดำเนินการทั้งหมด',
-        paymentStatus: 'รอการชำระเงิน',
-        quotationNo: 'QTT003'
-    },
-    {
-        orderId: 'SD392',
-        orderDate: '12/10/2024',
-        customerId: 'CTM310',
-        orderDetail: 'มิเตอร์ไฟฟ้าดิจิตอล',
-        expectedDate: '17/10/2024',
-        finishedDate: '16/10/2024',
-        orderPrice: '28,500',
-        orderProcess: 'เสร็จสิ้น',
-        paymentStatus: 'ชำระเงินแล้ว',
-        quotationNo: 'QTT004'
-    },
-    {
-        orderId: 'M7003',
-        orderDate: '11/10/2024',
-        customerId: 'CTM014',
-        orderDetail: 'มิเตอร์น้ำ TOU',
-        expectedDate: '16/10/2024',
-        finishedDate: 'N/A',
-        orderPrice: '35,000',
-        orderProcess: 'กำลังดำเนินการ',
-        paymentStatus: 'ชำระเงินแล้ว',
-        quotationNo: 'QTT005'
-    },
-    {
-        orderId: 'SD393',
-        orderDate: '10/10/2024',
-        customerId: 'CTM311',
-        orderDetail: 'มิเตอร์ไฟฟ้า Single Phase',
-        expectedDate: '15/10/2024',
-        finishedDate: '14/10/2024',
-        orderPrice: '22,000',
-        orderProcess: 'เสร็จสิ้น',
-        paymentStatus: 'ชำระเงินแล้ว',
-        quotationNo: 'QTT006'
-    }
-    ];
 
+export default function OrderTrackingPage() {
+    const [searchQuery, setSearchQuery] = useState('');
+    const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+    const [orders, setOrders] = useState<Order[]>([]);
 
-    export default function OrderTrackingPage() {
-        const [searchQuery, setSearchQuery] = useState('');
-        const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-        const [orders, setOrders] = useState(mockOrders);
-    
-        const filteredOrders = orders.filter(order =>  // เปลี่ยนจาก mockOrders เป็น orders
-            order.orderId.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            order.customerId.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            order.orderDetail.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            order.quotationNo.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            order.orderPrice.includes(searchQuery) ||
-            order.orderProcess.toLowerCase().includes(searchQuery.toLowerCase())
-        );
-    
-        // เพิ่ม type ให้กับ parameter
-        interface OrderData {
-            orderId: string;
-            orderDate: string;
-            customerId: string;
-            orderDetail: string;
-            expectedDate: string;
-            finishedDate: string;
-            orderPrice: string;
-            orderProcess: string;
-            paymentStatus: string;
-            quotationNo: string;
-        }
-    
-        const handleAddOrder = (newOrder: OrderData) => {
-            setOrders(prevOrders => [newOrder, ...prevOrders]);
-            setIsAddDialogOpen(false); // ปิด dialog หลังจากเพิ่มข้อมูล
+    // ดึงข้อมูล orders เมื่อโหลดหน้า
+    useEffect(() => {
+        const fetchOrders = async () => {
+            try {
+                const response = await fetch('/api/orders');
+                const data = await response.json();
+                setOrders(data);
+            } catch (error) {
+                console.error('Error fetching orders:', error);
+            }
         };
+        fetchOrders();
+    }, []);
 
+    
+    const filteredOrders = orders.filter(order => 
+        order.ORDER_ID.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        order.CUSTOMER_ID.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (order.ORDER_DETAIL?.toLowerCase() || '').includes(searchQuery.toLowerCase()) ||
+        (order.QUOTATION_NO?.toLowerCase() || '').includes(searchQuery.toLowerCase()) ||
+        String(order.ORDER_PRICE).includes(searchQuery) ||
+        (order.ORDER_PROCESS?.toLowerCase() || '').includes(searchQuery.toLowerCase())
+    );
+
+    // Format date function
+    const formatDate = (date: Date | null) => {
+        if (!date) return 'N/A';
+        return new Date(date).toLocaleDateString('th-TH');
+    };
+
+    // Format price function
+    const formatPrice = (price: number) => {
+        return price.toLocaleString('th-TH');
+    };
+
+    // แก้ไข handleAddOrder
+    const handleAddOrder = async (orderData: any, quotationData: any) => {
+        try {
+          console.log('Sending order data:', orderData);
+          const orderResponse = await fetch('/api/orders', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(orderData)
+          });
+          
+          if (!orderResponse.ok) {
+            throw new Error('Failed to create order');
+          }
+          
+          const orderResult = await orderResponse.json();
+          console.log('Order result:', orderResult);
+      
+          if (orderResult.status !== 'success') {
+            throw new Error(orderResult.message || 'Failed to create order');
+          }
+      
+          // เพิ่ม ORDER_ID เข้าไปใน quotationData
+          const quotationWithOrderId = {
+            ...quotationData,
+            ORDER_ID: orderResult.data.ORDER_ID
+          };
+      
+          console.log('Sending quotation data:', quotationWithOrderId);
+          const quotationResponse = await fetch('/api/quotations', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(quotationWithOrderId)
+          });
+      
+          if (!quotationResponse.ok) {
+            console.error('Quotation response not ok:', quotationResponse);
+            throw new Error('Failed to create quotation');
+          }
+      
+          const quotationResult = await quotationResponse.json();
+          console.log('Quotation result:', quotationResult);
+      
+          return {
+            order: orderResult.data,
+            quotation: quotationResult.data
+          };
+      
+        } catch (error) {
+          console.error('Error in handleAddOrder:', error);
+          throw error;
+        }
+      };
     // สถานะต่างๆ สำหรับ badge
     const getStatusColor = (status: string) => {
         switch (status) {
@@ -180,44 +190,45 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {filteredOrders.map((order) => (
-                                            <tr key={order.orderId} className="border-b hover:bg-gray-50">
-                                                <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-gray-900">
+                                    {filteredOrders.map((order) => (
+                                        <tr key={order.ORDER_ID} className="border-b hover:bg-gray-50">
+                                            <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-gray-900">
                                                 <Link 
                                                 href={{
-                                                    pathname: `/order_detail/${order.orderId}`,
+                                                    pathname: `/order_detail/${order.ORDER_ID}`,
                                                     query: {
-                                                    orderDate: order.orderDate,
-                                                    customerId: order.customerId,
-                                                    orderDetail: order.orderDetail,
-                                                    expectedDate: order.expectedDate,
-                                                    finishedDate: order.finishedDate,
-                                                    orderPrice: order.orderPrice,
-                                                    orderProcess: order.orderProcess,
-                                                    paymentStatus: order.paymentStatus,
-                                                    quotationNo: order.quotationNo
+                                                        orderDate: formatDate(order.ORDER_DATE),
+                                                        customerId: order.CUSTOMER_ID,
+                                                        orderDetail: order.ORDER_DETAIL,
+                                                        expectedDate: formatDate(order.EXPECTED_FINISH_DATE),
+                                                        finishedDate: formatDate(order.FINISHED_DATE),
+                                                        orderPrice: order.ORDER_PRICE,
+                                                        orderProcess: order.ORDER_PROCESS,
+                                                        paymentStatus: order.PAYMENT_STATUS,
+                                                        quotationNo: order.QUOTATION_NO,
+                                                        deviceType: order.DEVICE_TYPE
                                                     }
                                                 }}
                                                 className="text-blue-600 hover:text-blue-800 hover:underline"
                                                 >
-                                                {order.orderId}
+                                                {order.ORDER_ID}
                                                 </Link>
                                                 </td>
-                                                <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-600">{order.orderDate}</td>
-                                                <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-600">{order.customerId}</td>
-                                                <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-600">{order.orderDetail}</td>
-                                                <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-600">{order.expectedDate}</td>
-                                                <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-600">{order.finishedDate}</td>
-                                                <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-900">{order.orderPrice}</td>
+                                                <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-600"> {formatDate(order.ORDER_DATE)}</td>
+                                                <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-600">{order.CUSTOMER_ID}</td>
+                                                <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-600">{order.ORDER_DETAIL || '-'}</td>
+                                                <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-600">{formatDate(order.EXPECTED_FINISH_DATE)}</td>
+                                                <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-600">{formatDate(order.FINISHED_DATE)}</td>
+                                                <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-900">{formatPrice(order.ORDER_PRICE)}</td>
                                                 <td className="px-2 sm:px-4 py-2 sm:py-3">
-                                                    <span className={`px-2 sm:px-4 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm ${getStatusColor(order.orderProcess)}`}>
-                                                        {order.orderProcess}
+                                                    <span className={`px-2 sm:px-4 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm ${getStatusColor(order.ORDER_PROCESS || '')}`}>
+                                                        {order.ORDER_PROCESS}
                                                     </span>
                                                 </td>
-                                                <td className={`px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm  ${getPaymentStatusColor(order.paymentStatus)}`}>
-                                                    {order.paymentStatus}
+                                                <td className={`px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm  ${getPaymentStatusColor(order.PAYMENT_STATUS || '')}`}>
+                                                    {order.PAYMENT_STATUS}
                                                 </td>
-                                                <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-900">{order.quotationNo}</td>
+                                                <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-900">{order.QUOTATION_NO}</td>
                                             </tr>
                                         ))}
                                     </tbody>

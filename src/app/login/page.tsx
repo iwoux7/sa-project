@@ -63,7 +63,7 @@ export default function LoginPage() {
         <h1 className="login-title">เข้าสู่ระบบ</h1>
         
         <form onSubmit={handleSubmit}>
-          <div>
+          <div className='text-black'>
             <label>อีเมล<span style={{ color: '#FF0000' }}>*</span></label>
             <input
               type="email"
@@ -77,7 +77,7 @@ export default function LoginPage() {
             )}
           </div>
 
-          <div className='mt-2 mb-2'>
+          <div className='mt-2 mb-2 text-black'>
             <label>รหัสผ่าน<span style={{ color: '#FF0000' }}>*</span></label>
             <input
               type="password"
@@ -93,7 +93,9 @@ export default function LoginPage() {
 
           <div className="button-container-login">
             <button type="submit" className="button">
+              <a href='/home'>
               เข้าสู่ระบบ
+              </a>
             </button>
           </div>
 

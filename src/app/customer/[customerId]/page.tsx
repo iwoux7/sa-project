@@ -15,62 +15,70 @@ interface CustomerDetail {
     customerQuestion: string;
 }
 
-interface OrderHistory {
-    orderId: string;
-    orderDate: string;
-    orderDetail: string;
-    finishedDate: string;
-    orderPrice: string;
-    orderProcess: string;
-    quotationNo: string;
+interface Order {
+    ORDER_ID: string;
+    CUSTOMER_ID: string;
+    ORDER_DATE: string;
+    ORDER_DETAIL: string | null;
+    FINISHED_DATE: string | null;
+    ORDER_PRICE: number;
+    ORDER_PROCESS: string | null;
+    QUOTATION_NO: string | null;
 }
 
-export default function CustomerDetailPage() {
+export default function CustomerDetailPage({}) {
     const params = useParams();
     const searchParams = useSearchParams();
     const [customerData, setCustomerData] = useState<CustomerDetail | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-
-    const [orderHistory] = useState<OrderHistory[]>([
-        {
-            orderId: 'MT001',
-            orderDate: '8/8/2024',
-            orderDetail: '-',
-            finishedDate: '22/8/2024',
-            orderPrice: 'xx,xxx',
-            orderProcess: 'สินค้าเตรียมการจัดส่งแล้ว',
-            quotationNo: 'QTT001'
-        }
-    ]);
-
-  useEffect(() => {
-    const fetchCustomerData = async () => {
-        try {
-            const customerData: CustomerDetail = {
-                customerId: params.customerId as string,
-                customerName: searchParams.get('customerName') || '',
-                customerPhone_Number: searchParams.get('customerPhone_Number') || '',
-                customerEmail: searchParams.get('customerEmail') || '',
-                customerAddress: searchParams.get('customerAddress') || '',
-                customerStatus: searchParams.get('customerStatus') || '',
-                customerQuestion: searchParams.get('customerQuestion') || ''
-            };
+    useEffect(() => {
+        // ตั้งค่าข้อมูลลูกค้าโดยตรงจาก searchParams
+        const customerData = {
+            customerId: params.customerId as string,
+            customerName: searchParams.get('customerName') || '',
+            customerPhone_Number: searchParams.get('customerPhone_Number') || '',
+            customerEmail: searchParams.get('customerEmail') || '',
+            customerAddress: searchParams.get('customerAddress') || '',
+            customerStatus: searchParams.get('customerStatus') || '',
+            customerQuestion: searchParams.get('customerQuestion') || ''
+        };
         
-            await new Promise(resolve => setTimeout(resolve, 300));
-            setCustomerData(customerData);
-            setError(null);
+        setCustomerData(customerData);
+        setIsLoading(false);
+    }, [params.customerId, searchParams]);
+
+  const [orders, setOrders] = useState<Order[]>([]);
+  
+  useEffect(() => {
+    const fetchOrders = async () => {
+        try {
+            if (!params.customerId) return;
+            
+            const response = await fetch(`/api/customer/${params.customerId}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch orders');
+            }
+
+            const result = await response.json();
+            console.log('API Response:', result);
+
+            if (result.status === 'success') {
+                setOrders(result.data);
+            } else {
+                throw new Error(result.message || 'Failed to fetch orders');
+            }
+
         } catch (err) {
-            setError('ไม่สามารถโหลดข้อมูลได้ กรุณาลองใหม่อีกครั้ง');
+            console.error("Error fetching orders:", err);
+            setError('ไม่สามารถโหลดข้อมูลคำสั่งซื้อได้');
         } finally {
             setIsLoading(false);
         }
     };
 
-    if (params.customerId) {
-      fetchCustomerData();
-    }
-  }, [params.customerId, searchParams]);
+    fetchOrders();
+}, [params.customerId]); // เปลี่ยน dependency เป็น params.customerId
 
     if (isLoading) {
         return (
@@ -166,18 +174,33 @@ export default function CustomerDetailPage() {
                 </tr>
               </thead>
               <tbody>
-                {orderHistory.map((order, index) => (
-                  <tr key={order.orderId} className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
-                    <td className="px-6 py-4 text-m text-black">{order.orderId}</td>
-                    <td className="px-6 py-4 text-m text-black">{order.orderDate}</td>
-                    <td className="px-6 py-4 text-m text-black">{order.orderDetail}</td>
-                    <td className="px-6 py-4 text-m text-black">{order.finishedDate}</td>
-                    <td className="px-6 py-4 text-m text-black">{order.orderPrice}</td>
-                    <td className="px-6 py-4 text-m text-black">{order.orderProcess}</td>
-                    <td className="px-6 py-4 text-m text-black">{order.quotationNo}</td>
-                  </tr>
-                ))}
-              </tbody>
+                {orders.length === 0 ? (
+                    <tr>
+                        <td colSpan={7} className="text-center py-4">ไม่มีประวัติการสั่งซื้อ</td>
+                    </tr>
+                ) : (
+                    orders.map((order, index) => (
+                        <tr key={order.ORDER_ID} className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
+                            <td className="px-6 py-4 text-m text-black">{order.ORDER_ID}</td>
+                            <td className="px-6 py-4 text-m text-black">
+                                {new Date(order.ORDER_DATE).toLocaleDateString('th-TH')}
+                            </td>
+                            <td className="px-6 py-4 text-m text-black">{order.ORDER_DETAIL || '-'}</td>
+                            <td className="px-6 py-4 text-m text-black">
+                                {order.FINISHED_DATE ? 
+                                    new Date(order.FINISHED_DATE).toLocaleDateString('th-TH') : 
+                                    '-'
+                                }
+                            </td>
+                            <td className="px-6 py-4 text-m text-black">
+                                {order.ORDER_PRICE?.toLocaleString('th-TH')}
+                            </td>
+                            <td className="px-6 py-4 text-m text-black">{order.ORDER_PROCESS || '-'}</td>
+                            <td className="px-6 py-4 text-m text-black">{order.QUOTATION_NO || '-'}</td>
+                        </tr>
+                    ))
+                )}
+            </tbody>
             </table>
           </div>
           </div>

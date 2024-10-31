@@ -1,0 +1,132 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model CUSTOMERS {
+  CUSTOMER_ID           String            @id @db.VarChar(50)
+  USER_ID              String            @db.VarChar(50)
+  CUSTOMER_NAME        String            @db.VarChar(255)
+  CUSTOMER_PHONE_NUMBER String            @unique @db.VarChar(20)
+  CUSTOMER_ADDRESS     String?           @db.VarChar(255)
+  CUSTOMER_STATUS      String?           @db.VarChar(50)
+  CUSTOMER_QUESTION    String?           @db.Text
+  
+  user                 USERS             @relation(fields: [USER_ID], references: [USER_ID])
+  orders              CUSTOMER_ORDERS[]
+}
+
+model CUSTOMER_ORDERS {
+  ORDER_ID             String      @id @db.VarChar(50)
+  ORDER_DATE           DateTime    @db.DateTime(0)
+  CUSTOMER_ID          String      @db.VarChar(50)
+  ORDER_DETAIL         String?     @db.Text
+  ORDER_PRICE          Decimal     @db.Decimal(10, 2)
+  PAYMENT_STATUS       String?     @db.VarChar(50)
+  ORDER_PROCESS        String?     @db.VarChar(50)
+  EXPECTED_FINISH_DATE DateTime?   @db.DateTime(0)
+  FINISHED_DATE        DateTime?   @db.DateTime(0)
+  APPOINTMENT_DATE     DateTime?   @db.DateTime(0)
+  QUOTATION_NO         String?     @db.VarChar(50)
+  DEVICE_TYPE          String      @db.VarChar(50)
+
+  customer             CUSTOMERS   @relation(fields: [CUSTOMER_ID], references: [CUSTOMER_ID])
+  quotation           QUOTATIONS? @relation("QuotationOrder")
+}
+
+model ELEMENTS {
+  ELEMENT_ID          String                 @id @db.VarChar(50)
+  ELEMENT_NAME        String                 @db.VarChar(100)
+  ELEMENT_DETAIL      String?                @db.Text
+  ELEMENT_UNIT_PRICE  Decimal?               @db.Decimal(10, 2)
+  ELEMENT_CATEGORY    String?                @db.VarChar(50)
+  DEVICE_CATEGORY     String?                @db.VarChar(50)
+  SUPPLIER_ID         String?                @db.VarChar(50)
+
+  supplier            SUPPLIERS?             @relation(fields: [SUPPLIER_ID], references: [SUPPLIER_ID])
+  quotations          ELEMENTS_IN_QUOTATION[]
+  elements_suppliers  ELEMENTS_SUPPLIERS[]
+  history_orders      HISTORY_ORDERS[]
+}
+
+model ELEMENTS_IN_QUOTATION {
+  QUOTATION_NO       String    @db.VarChar(20)
+  ELEMENT_ID         String    @db.VarChar(50)
+  ELEMENT_UNIT_PRICE Decimal?  @db.Decimal(10, 2)
+  QUANTITY           Int?
+  TOTAL_PRICE        Decimal?  @db.Decimal(10, 2)
+
+  quotation          QUOTATIONS @relation(fields: [QUOTATION_NO], references: [QUOTATION_NO])
+  element            ELEMENTS   @relation(fields: [ELEMENT_ID], references: [ELEMENT_ID])
+
+  @@id([QUOTATION_NO, ELEMENT_ID])
+}
+
+model ELEMENTS_SUPPLIERS {
+  ELEMENT_ID   String    @db.VarChar(50)
+  SUPPLIER_ID  String    @db.VarChar(50)
+  UNIT_PRICE   Decimal   @db.Decimal(10, 2)
+  LAST_UPDATE  DateTime  @db.DateTime(0)
+
+  element      ELEMENTS  @relation(fields: [ELEMENT_ID], references: [ELEMENT_ID])
+  supplier     SUPPLIERS @relation(fields: [SUPPLIER_ID], references: [SUPPLIER_ID])
+
+  @@id([ELEMENT_ID, SUPPLIER_ID])
+}
+
+model HISTORY_ORDERS {
+  ORDER_DATE   DateTime  @db.DateTime(0)
+  SUPPLIER_ID  String    @db.VarChar(50)
+  ELEMENT_ID   String    @db.VarChar(50)
+  AMOUNT       Int
+  UNIT_PRICE   Decimal   @db.Decimal(10, 2)
+  TOTAL_PRICE  Decimal   @db.Decimal(10, 2)
+
+  supplier     SUPPLIERS @relation(fields: [SUPPLIER_ID], references: [SUPPLIER_ID])
+  element      ELEMENTS  @relation(fields: [ELEMENT_ID], references: [ELEMENT_ID])
+
+  @@id([ORDER_DATE, SUPPLIER_ID, ELEMENT_ID])
+}
+
+model QUOTATIONS {
+  QUOTATION_NO     String    @id @db.VarChar(20)
+  CO_NAME          String    @db.VarChar(100)
+  CO_ADDRESS       String?   @db.Text
+  CO_PHONE_NUMBER  String    @db.VarChar(20)
+  CO_EMAIL         String?   @db.VarChar(100)
+  ORDER_ID         String?   @unique @db.VarChar(50)
+  DEVICE_TYPE      String?   @db.VarChar(50)
+  CREATE_DATE      DateTime? @db.DateTime(0)
+  WAGE             Decimal?  @db.Decimal(10, 2)
+  TOTAL_PRICE      Decimal?  @db.Decimal(10, 2)
+  PAYMENT_TYPE     String?   @db.VarChar(50)
+  REMARK           String?   @db.Text
+
+  customer_order   CUSTOMER_ORDERS? @relation("QuotationOrder", fields: [ORDER_ID], references: [ORDER_ID])
+  elements         ELEMENTS_IN_QUOTATION[]
+}
+
+model SUPPLIERS {
+  SUPPLIER_ID            String               @id @db.VarChar(50)
+  SUPPLIER_NAME          String               @unique @db.VarChar(100)
+  SUPPLIER_PHONE_NUMBER  String?              @db.VarChar(20)
+  SUPPLIER_EMAIL         String?              @db.VarChar(100)
+  SUPPLIER_ADDRESS       String?              @db.Text
+
+  elements              ELEMENTS[]
+  elements_suppliers    ELEMENTS_SUPPLIERS[]
+  history_orders        HISTORY_ORDERS[]
+}
+
+model USERS {
+  USER_ID        String      @id @db.VarChar(50)
+  USER_EMAIL     String      @unique @db.VarChar(100)
+  USER_PASSWORD  String      @db.VarChar(20)
+  USER_ROLE      String      @db.VarChar(10)
+
+  customers      CUSTOMERS[]
+}

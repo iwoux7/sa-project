@@ -114,7 +114,7 @@ export default function RegisterPage() {
           <h1 className="login-title">ลงทะเบียน</h1>
           
           <form onSubmit={handleSubmit}>
-            <div className='mb-2'>
+            <div className='mb-2 text-black'>
               <label>ชื่อ-นามสกุล<span style={{ color: '#FF0000' }}>*</span></label>
               <input
                 type='text'
@@ -128,7 +128,7 @@ export default function RegisterPage() {
               )}
             </div>
 
-            <div className='mb-2'>
+            <div className='mb-2 text-black'>
               <label>เบอร์โทร<span style={{ color: '#FF0000' }}>*</span></label>
               <input
                 type='tel'
@@ -144,7 +144,7 @@ export default function RegisterPage() {
               )}
             </div>
 
-            <div className='mb-2'>
+            <div className='mb-2 text-black'>
               <label>อีเมล<span style={{ color: '#FF0000' }}>*</span></label>
               <input
                 type='email'
@@ -158,7 +158,7 @@ export default function RegisterPage() {
               )}
             </div>
 
-            <div className='mb-2'>
+            <div className='mb-2 text-black'>
               <label>รหัสผ่าน<span style={{ color: '#FF0000' }}>*</span></label>
               <input
                 type='password'
@@ -172,7 +172,7 @@ export default function RegisterPage() {
               )}
             </div>
 
-            <div className='mb-2'>
+            <div className='mb-2 text-black'>
               <label>ยืนยันรหัสผ่าน<span style={{ color: '#FF0000' }}>*</span></label>
               <input
                 type='password'
@@ -186,7 +186,7 @@ export default function RegisterPage() {
               )}
             </div>
 
-            <div>
+            <div className='mb-2 text-black'>
               <label>ที่อยู่<span style={{ color: '#FF0000' }}>*</span></label>
               <textarea
                 placeholder='ที่อยู่'
@@ -205,7 +205,7 @@ export default function RegisterPage() {
               </button>
             </div>
 
-            <div className="text-center mt-4">
+            <div className="text-center mt-4 text-black">
               <span>มีบัญชีอยู่แล้ว </span> 
               <Link href="/login" className="no-account">
                 <u>เข้าสู่ระบบที่นี่</u>

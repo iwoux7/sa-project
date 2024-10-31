@@ -34,7 +34,7 @@ export default function QuotationDetailPage() {
                 height={200}
                 className="mb-2"
               />
-              <div className="text-center">
+              <div className="text-center text-black">
                 <h2 className="font-bold text-lg">Tech Lifestyle</h2>
                 <p className="text-sm">248 ถนนอุปราช22 ซอย 11/2 อีสานใหม่</p>
                 <p className="text-sm">อำเภอเมือง อุบลราชธานี 11000</p>
@@ -42,10 +42,10 @@ export default function QuotationDetailPage() {
               </div>
             </div>
 
-            <h3 className="text-center font-bold text-xl mb-6">ใบเสนอราคา</h3>
+            <h3 className="text-center font-bold text-xl mb-6 text-black">ใบเสนอราคา</h3>
 
             {/* Customer Info Grid */}
-            <div className="grid grid-cols-2 gap-8 mb-6 text-sm">
+            <div className="grid grid-cols-2 gap-8 mb-6 text-sm text-black">
               <div>
                 <p><strong>ชื่อผู้ซื้อ:</strong> อาทิตย์ สุริยะทักษ์</p>
                 <p><strong>อีเมล:</strong> solar_universe@gmail.com</p>
@@ -61,9 +61,9 @@ export default function QuotationDetailPage() {
             </div>
 
             {/* Items Table */}
-            <table className="w-full mb-6">
+            <table className="w-full mb-6 text-black">
               <thead>
-                <tr className="border-b">
+                <tr className="border-b border-black">
                   <th className="text-left p-2">ลำดับ</th>
                   <th className="text-left p-2">รหัสสินค้า</th>
                   <th className="text-left p-2">ชื่อสินค้า</th>
@@ -73,7 +73,7 @@ export default function QuotationDetailPage() {
                 </tr>
               </thead>
               <tbody>
-                <tr className="border-b">
+                <tr className="border-b border-black">
                   <td className="p-2">1</td>
                   <td className="p-2">ELM011</td>
                   <td className="p-2">มิเตอร์ไฟฟ้า NXTS-Hand</td>
@@ -86,7 +86,7 @@ export default function QuotationDetailPage() {
             </table>
 
             {/* Totals */}
-            <div className="flex justify-end mb-8">
+            <div className="flex justify-end mb-8 text-black">
               <div className="w-64">
                 <div className="flex justify-between py-2 border-b">
                   <span>รวมเงิน</span>
@@ -104,7 +104,7 @@ export default function QuotationDetailPage() {
             </div>
 
             {/* Footer */}
-            <div className="grid grid-cols-2 gap-8">
+            <div className="grid grid-cols-2 gap-8 text-black">
               <div>
                 <h4 className="font-bold mb-2">การชำระเงิน</h4>
                 <div className="space-y-1 text-sm">

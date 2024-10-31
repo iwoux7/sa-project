@@ -1,7 +1,7 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, ChevronLeft } from 'lucide-react';
-import { Navbar } from '@/layouts/Navbar';
+import { Navbar } from '@/layouts/AdminNavbar';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import {
@@ -17,10 +17,11 @@ import {
 
 // กำหนด interface สำหรับ TypeScript
 interface Part {
-  id: string;
-  name: string;
-  specs: string;
-  price: string;
+  ELEMENT_ID: string;
+  ELEMENT_NAME: string;
+  ELEMENT_DETAIL: string | null;
+  ELEMENT_UNIT_PRICE: number;
+  ELEMENT_CATEGORY: string | null;
 }
 
 interface CartItem extends Part {
@@ -28,27 +29,20 @@ interface CartItem extends Part {
   total: number;
 }
 
-// Sample data structure for parts
-const sampleParts: Part[] = [
-  {
-    id: 'ELM001',
-    name: 'Tongwei solar Mono 405W Full-black',
-    specs: 'โซลาเซลล์ 405W ไบเฟส 20.5 เซล ขนาด 1.134 x 17.22 x 30 มม.',
-    price: 'x,xxx'
-  },
-  {
-    id: 'ELM007',
-    name: 'เทคโนโลยีหลัก TMDA-PYT1F',
-    specs: 'Sample specs for ELM007',
-    price: 'xx,xxx'
-  },
-  {
-    id: 'ELM008',
-    name: 'Smart meter 1 phase for TMDA',
-    specs: 'Sample specs for ELM008',
-    price: 'xx,xxx'
-  }
-];
+interface ElementToUpdate {
+  ELEMENT_ID: string;
+  QUANTITY: number;
+  ELEMENT_UNIT_PRICE: number;
+  TOTAL_PRICE: number;
+}
+
+interface QuotationUpdate {
+  QUOTATION_NO: string;
+  elements: ElementToUpdate[];
+  WAGE: number;
+  TOTAL_PRICE: number;
+}
+
 
 export default function AddPartsPage() {
   const params = useParams();
@@ -59,8 +53,31 @@ export default function AddPartsPage() {
   const [suggestions, setSuggestions] = useState<Part[]>([]);
   const [wage, setWage] = useState<number>(0);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [allParts, setAllParts] = useState<Part[]>([]); // เพิ่ม state สำหรับเก็บข้อมูลทั้งหมด
+  const [isConfirmSaveOpen, setIsConfirmSaveOpen] = useState(false);
+  const quotaionNo = params.quotationid;
 
-  // Handle search input
+  // ดึงข้อมูล Elements เมื่อโหลดหน้า
+  useEffect(() => {
+    const fetchElements = async () => {
+      try {
+        const response = await fetch('/api/elements');
+        if (!response.ok) {
+          throw new Error('Failed to fetch elements');
+        }
+        const result = await response.json();
+        if (result.status === 'success') {
+          setAllParts(result.data);
+        }
+      } catch (error) {
+        console.error('Error fetching elements:', error);
+      }
+    };
+
+    fetchElements();
+  }, []);
+
+  // แก้ไขฟังก์ชัน handleSearch
   const handleSearch = (value: string) => {
     setSearchTerm(value);
     if (value.trim() === '') {
@@ -68,27 +85,22 @@ export default function AddPartsPage() {
       return;
     }
     
-    const filtered = sampleParts.filter(part => 
-      part.id.toLowerCase().includes(value.toLowerCase()) ||
-      part.name.toLowerCase().includes(value.toLowerCase())
+    console.log('All parts:', allParts); // เพิ่ม log ตรวจสอบข้อมูล
+    const filtered = allParts.filter(part => 
+      part.ELEMENT_ID.toLowerCase().includes(value.toLowerCase()) ||
+      part.ELEMENT_NAME.toLowerCase().includes(value.toLowerCase())
     );
+    console.log('Filtered suggestions:', filtered); // เพิ่ม log ตรวจสอบผลการ filter
     setSuggestions(filtered);
-  };
+};
 
-  // Select a part from suggestions
-  const handleSelectPart = (part: Part) => {
-    setSelectedPart(part);
-    setSearchTerm('');
-    setSuggestions([]);
-  };
-
-  // Add part to cart
+  // แก้ไขฟังก์ชัน handleAddPart
   const handleAddPart = () => {
     if (selectedPart) {
       const newItem: CartItem = {
         ...selectedPart,
         quantity,
-        total: parseFloat(selectedPart.price.replace(/[^0-9.-]+/g, '')) * quantity
+        total: selectedPart.ELEMENT_UNIT_PRICE * quantity
       };
       
       setCartItems([...cartItems, newItem]);
@@ -96,6 +108,13 @@ export default function AddPartsPage() {
       setQuantity(1);
       setIsConfirmOpen(false);
     }
+  };
+
+  // Select a part from suggestions
+  const handleSelectPart = (part: Part) => {
+    setSelectedPart(part);
+    setSearchTerm('');
+    setSuggestions([]);
   };
 
   // Remove part from cart
@@ -109,25 +128,65 @@ export default function AddPartsPage() {
   const total = subtotal + wage; // คำนวณรวมกับค่าแรง
 
 
+  const handleSave = async () => {
+    try {
+      const elements = cartItems.map(item => ({
+        ELEMENT_ID: item.ELEMENT_ID,
+        QUANTITY: item.quantity,
+        ELEMENT_UNIT_PRICE: item.ELEMENT_UNIT_PRICE, // ไม่ต้อง parse เพราะเป็น number อยู่แล้ว
+        TOTAL_PRICE: item.total
+      }));
+  
+  
+      // ดึง quotationNo จาก URL parameters
+      const response = await fetch(`/api/quotations/${params.quotationNo}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          QUOTATION_NO: quotaionNo,
+          elements: elements,
+          WAGE: wage,
+          TOTAL_PRICE: total
+        })
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to update quotation');
+      }
+  
+      const result = await response.json();
+      if (result.status === 'success') {
+        // Redirect back to order detail page
+        window.location.href = `/order_detail/${params.orderId}`;
+      } else {
+        throw new Error(result.message || 'Failed to update quotation');
+      }
+  
+    } catch (error) {
+      console.error('Error saving quotation:', error);
+      // แสดง error message ให้ user
+      alert('เกิดข้อผิดพลาดในการบันทึกข้อมูล');
+    }
+  };
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
-      <div className="max-w-7xl mx-auto px-4 py-6 ">
+      <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-6 pt-14 sm:pt-16 md:pt-20">
+      <div className="bg-white rounded-lg shadow p-6">
         {/* Header with back button */}
         <div className="mb-6">
-          <Link 
-            href={`/order_detail/${params.orderId}`}
-            className="text-blue-600 flex items-center mb-4"
+          <Link href={`/order_detail/${params.orderId}`}
+            className="text-blue-600 flex items-center"
           >
-            <ChevronLeft className="w-4 h-4 mr-1" />
+            <ChevronLeft className="w-4 h-4 " />
             ย้อนกลับ
           </Link>
-          <h1 style={{ color: '#1e40af' }}  className="text-xl font-semibold text-center">
+          <h1 style={{ color: '#1e40af' }}  className="text-xl sm:text-2xl lg:text-3xl font-semibold text-center mb-4 sm:mb-6">
             เพิ่มชิ้นส่วนในรหัส {params.orderId}
           </h1>
         </div>
-
-        <div className="bg-white rounded-lg shadow">
           <div className="flex gap-8 p-6 ">
             {/* Left side - Cart */}
             <div className="w-1/2 border border-black rounded-lg p-4 ">
@@ -145,19 +204,21 @@ export default function AddPartsPage() {
                 <tbody>
                   {cartItems.map((item, index) => (
                     <tr key={index} className="border-b">
-                      <td className="py-2 w-8">
-                        <button 
-                          onClick={() => handleRemovePart(index)}
-                          className="text-red-500 font-bold"
-                        >
-                          -
-                        </button>
-                      </td>
-                      <td className="py-2 text-black">{item.id}</td>
-                      <td className="py-2 text-black">{item.name}</td>
-                      <td className="py-2 text-center text-black">{item.quantity}</td>
-                      <td className="py-2 text-right text-black">{item.price}</td>
-                    </tr>
+                    <td className="py-2 w-8">
+                      <button 
+                        onClick={() => handleRemovePart(index)}
+                        className="text-red-500 font-bold"
+                      >
+                        -
+                      </button>
+                    </td>
+                    <td className="py-2 text-black">{item.ELEMENT_ID}</td>
+                    <td className="py-2 text-black">{item.ELEMENT_NAME}</td>
+                    <td className="py-2 text-center text-black">{item.quantity}</td>
+                    <td className="py-2 text-right text-black">
+                      {item.ELEMENT_UNIT_PRICE.toLocaleString()}
+                    </td>
+                  </tr>
                   ))}
                   {/* ถ้าไม่มีรายการ แสดงแถวว่าง */}
                     {cartItems.length === 0 && (
@@ -207,16 +268,17 @@ export default function AddPartsPage() {
                 />
                 <Search className="absolute left-3 top-3 text-gray-400" size={20} />
                 
+                {/* แก้ไขส่วน suggestions */}
                 {suggestions.length > 0 && (
                   <div className="absolute w-full bg-white border rounded-lg mt-1 shadow-lg z-10">
                     {suggestions.map((part) => (
                       <div
-                        key={part.id}
+                        key={part.ELEMENT_ID}
                         className="p-2 hover:bg-gray-100 cursor-pointer"
                         onClick={() => handleSelectPart(part)}
                       >
-                        <div className="font-semibold">{part.id}</div>
-                        <div className="text-sm text-gray-600">{part.name}</div>
+                        <div className="font-semibold">{part.ELEMENT_ID}</div>
+                        <div className="text-sm text-gray-600">{part.ELEMENT_NAME}</div>
                       </div>
                     ))}
                   </div>
@@ -227,19 +289,19 @@ export default function AddPartsPage() {
                 <div className="mt-4 space-y-4 text-black">
                   <div>
                     <label className="block text-sm font-medium text-gray-700">รหัสชิ้นส่วน:</label>
-                    <div>{selectedPart.id}</div>
+                    <div>{selectedPart.ELEMENT_ID}</div>  
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700">ชื่อชิ้นส่วน:</label>
-                    <div>{selectedPart.name}</div>
+                    <div>{selectedPart.ELEMENT_NAME}</div> 
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700">รายละเอียด:</label>
-                    <div>{selectedPart.specs}</div>
+                    <div>{selectedPart.ELEMENT_DETAIL || '-'}</div> 
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700">ราคาต่อหน่วย:</label>
-                    <div>{selectedPart.price} บาท</div>
+                    <div>{selectedPart.ELEMENT_UNIT_PRICE.toLocaleString()} บาท</div> 
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700">จำนวน:</label>
@@ -261,16 +323,16 @@ export default function AddPartsPage() {
                 </div>
               )}
               {/* Confirmation Modal */}
-                  <AlertDialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
-                    <AlertDialogContent className="bg-white text-black ">
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>
-                          ยืนยันการเพิ่มชิ้นส่วน {selectedPart?.id} หรือไม่
-                        </AlertDialogTitle>
-                        <AlertDialogDescription>
-                          {selectedPart?.name}
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
+              <AlertDialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
+                <AlertDialogContent className="bg-white text-black">
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>
+                      ยืนยันการเพิ่มชิ้นส่วน {selectedPart?.ELEMENT_ID} หรือไม่
+                    </AlertDialogTitle>
+                    <AlertDialogDescription>
+                      {selectedPart?.ELEMENT_NAME}
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
                       <AlertDialogFooter>
                         <div className="flex justify-center gap-4 w-full">
                           <AlertDialogCancel className="buttonwhite">
@@ -292,13 +354,36 @@ export default function AddPartsPage() {
                 <div className="border-t p-4 flex justify-end gap-4">
                   <button
                     className="buttonemerald"
-                    onClick={() => {
-                      // Handle save with wage
-                      console.log('Saving order with items:', cartItems, 'wage:', wage);
-                    }}
+                    onClick={handleSave}
+                    disabled={cartItems.length === 0} 
                   >
                     ยืนยัน
                   </button>
+                  <AlertDialog open={isConfirmSaveOpen} onOpenChange={setIsConfirmSaveOpen}>
+                    <AlertDialogContent className="bg-white text-black">
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>
+                          ยืนยันการบันทึกข้อมูล
+                        </AlertDialogTitle>
+                        <AlertDialogDescription>
+                          คุณต้องการบันทึกรายการชิ้นส่วนทั้งหมดใช่หรือไม่
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <div className="flex justify-center gap-4 w-full">
+                          <AlertDialogCancel className="buttonwhite">
+                            ยกเลิก
+                          </AlertDialogCancel>
+                          <AlertDialogAction 
+                            onClick={handleSave}
+                            className="w-24 buttonemerald"
+                          >
+                            ยืนยัน
+                          </AlertDialogAction>
+                        </div>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </div>
               </div>
             </div>

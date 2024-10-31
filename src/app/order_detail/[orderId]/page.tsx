@@ -17,76 +17,51 @@ interface OrderDetail {
   orderProcess: string;
   paymentStatus: string;
   quotationNo: string;
-  deviceType: string;
-  elementId: string;
-  amount: number;
-  wage: string;
-  totalPrice: string;
-  paymentType: string;
-  remark: string;
+  deviceType: string;  // เพิ่ม field นี้
+  elementId: string; 
 }
-const OrderDetailSkeleton = () => {
-  return (
-    <div className="min-h-screen bg-white">
-      <Navbar />
-      <main className="container mx-auto px-4 py-6">
-        {/* Header Skeleton */}
-        <div className="flex items-center mb-4">
-          <div className="w-24 h-6 bg-gray-200 rounded animate-pulse"></div>
-          <div className="flex-1 h-8 bg-gray-200 rounded mx-4 animate-pulse"></div>
-        </div>
 
-        {/* Content Grid Skeleton */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Left Panel Skeleton */}
-          <div className="border rounded-lg p-4">
-            <div className="h-8 bg-gray-200 rounded mb-4 animate-pulse"></div>
-            <div className="space-y-3">
-              {[...Array(10)].map((_, i) => (
-                <div key={i} className="flex items-center">
-                  <div className="w-32 h-4 bg-gray-200 rounded animate-pulse"></div>
-                  <div className="flex-1 h-4 bg-gray-200 rounded ml-4 animate-pulse"></div>
-                </div>
-              ))}
-            </div>
-            <div className="mt-4">
-              <div className="h-10 bg-gray-200 rounded animate-pulse"></div>
-            </div>
-          </div>
+interface ElementInQuotation {
+  ELEMENT_ID: string;
+  QUANTITY: number;
+  ELEMENT_UNIT_PRICE: number;
+  TOTAL_PRICE: number;
+  ELEMENT_NAME: string;  // เปลี่ยนจาก nested object เป็น field ตรง
+  ELEMENT_DETAIL: string | null;
+}
 
-          {/* Right Panel Skeleton */}
-          <div className="border rounded-lg p-4">
-            <div className="h-8 bg-gray-200 rounded mb-4 animate-pulse"></div>
-            {/* Tables Skeleton */}
-            {[...Array(3)].map((_, i) => (
-              <div key={i} className="mb-4">
-                <div className="h-12 bg-gray-200 rounded-t animate-pulse"></div>
-                <div className="h-12 bg-gray-100 rounded-b animate-pulse"></div>
-              </div>
-            ))}
-            {/* Buttons Skeleton */}
-            <div className="flex flex-col items-center space-y-2">
-              <div className="w-32 h-10 bg-gray-200 rounded animate-pulse"></div>
-              <div className="w-32 h-10 bg-gray-200 rounded animate-pulse"></div>
-            </div>
-          </div>
-        </div>
-      </main>
-    </div>
+interface QuotationDetail {
+  QUOTATION_NO: string;
+  DEVICE_TYPE: string;
+  CREATE_DATE: string;
+  ELEMENTS_IN_QUOTATION: ElementInQuotation[];
+  WAGE: number;
+  PAYMENT_TYPE: string;
+  REMARK: string;
+}
+
+const getTotalPrice = (quotationData: QuotationDetail | null) => {
+  if (!quotationData?.ELEMENTS_IN_QUOTATION) return 0;
+  
+  // แปลงเป็นตัวเลขก่อนคำนวณ
+  const elementsTotal = quotationData.ELEMENTS_IN_QUOTATION.reduce(
+    (sum, item) => sum + Number(item.TOTAL_PRICE), 
+    0
   );
-};
+  
+  // แปลง WAGE เป็นตัวเลข
+  const wage = Number(quotationData.WAGE) || 0;
+  
+  return elementsTotal + wage;
+}
 export default function OrderDetailPage() {
   const params = useParams();
   const searchParams = useSearchParams();
   const [orderData, setOrderData] = useState<OrderDetail | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [quotationData, setQuotationData] = useState<QuotationDetail | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
-  const orderId = params.orderId as string;
-  const orderDate = searchParams.get('orderDate');
-  const customerId = searchParams.get('customerId');
-  const orderDetail = searchParams.get('orderDetail');
-  const quotationNo = searchParams.get('quotationNo');
+  const [isLoading, setIsLoading] = useState(true);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   const handleSaveEdit = (updatedData: any) => {
     // อัพเดทข้อมูลในระบบ
@@ -95,50 +70,42 @@ export default function OrderDetailPage() {
   };
 
   useEffect(() => {
-    const fetchOrderData = async () => {
-      try {
-        setIsLoading(true);
-        // ในสถานการณ์จริง คุณจะต้องเรียก API ของคุณที่นี่
-        // const response = await fetch(`/api/orders/${params.orderId}`);
-        // const data = await response.json();
-        
-        // สำหรับตัวอย่าง เราจะจำลองการดึงข้อมูล
-        const mockData: OrderDetail = {
-          orderId: orderId,
-          orderDate: orderDate || 'N/A',
-          customerId: customerId || 'N/A',
-          orderDetail: orderDetail || 'N/A',
-          expectedDate: searchParams.get('expectedDate') || 'N/A',
-          finishedDate: searchParams.get('finishedDate') || 'N/A',
-          orderPrice: searchParams.get('orderPrice') || '0',
-          orderProcess: searchParams.get('orderProcess') || 'รอดำเนินการ',
-          paymentStatus: searchParams.get('paymentStatus') || 'รอการชำระเงิน',
-          quotationNo: quotationNo || 'N/A',
-          deviceType: searchParams.get('deviceType') || 'มิเตอร์ไฟฟ้า TOU',
-          elementId: searchParams.get('elementId') || 'N/A',
-          amount: parseInt(searchParams.get('amount') || '1'),
-          wage: searchParams.get('wage') || 'x,xxx',
-          totalPrice: searchParams.get('totalPrice') || '0',
-          paymentType: searchParams.get('paymentType') || 'โอนเงินทางธนาคาร',
-          remark: searchParams.get('remark') || '-'
-        };
+    // ดึงข้อมูลจาก URL parameters
+    const order: OrderDetail = {
+      orderId: params.orderId as string,
+      orderDate: searchParams.get('orderDate') || 'N/A',
+      customerId: searchParams.get('customerId') || 'N/A',
+      orderDetail: searchParams.get('orderDetail') || 'N/A',
+      expectedDate: searchParams.get('expectedDate') || 'N/A',
+      finishedDate: searchParams.get('finishedDate') || 'N/A',
+      orderPrice: searchParams.get('orderPrice') || '0',
+      orderProcess: searchParams.get('orderProcess') || 'รอดำเนินการ',
+      paymentStatus: searchParams.get('paymentStatus') || 'รอการชำระเงิน',
+      quotationNo: searchParams.get('quotationNo') || 'N/A',
+      deviceType: searchParams.get('deviceType') || '-',
+      elementId: searchParams.get('elementId') || 'N/A',
+    };
+    setOrderData(order);
+    setIsLoading(false);
+  }, [params, searchParams]);
 
-        // จำลองการดีเลย์ของ network
-        await new Promise(resolve => setTimeout(resolve, 300));
-        
-        setOrderData(mockData);
-        setError(null);
-      } catch (err) {
-        setError('ไม่สามารถโหลดข้อมูลได้ กรุณาลองใหม่อีกครั้ง');
-      } finally {
-        setIsLoading(false);
+  useEffect(() => {
+    const fetchQuotationData = async () => {
+      if (!orderData?.quotationNo || orderData.quotationNo === 'N/A') return;
+      
+      try {
+        const response = await fetch(`/api/quotations/${orderData.quotationNo}`);
+        if (!response.ok) throw new Error('Failed to fetch quotation');
+        const result = await response.json();
+        console.log('API Response:', result); // เพิ่มบรรทัดนี้
+        setQuotationData(result.data);  // ต้องใช้ result.data เพราะเรา wrap ด้วย status
+      } catch (error) {
+        console.error('Error fetching quotation:', error);
       }
     };
-
-    if (params.orderId) {
-      fetchOrderData();
-    }
-  }, [params.orderId]);
+  
+    fetchQuotationData();
+  }, [orderData?.quotationNo]);
 
   if (isLoading) {
     return (
@@ -269,21 +236,33 @@ export default function OrderDetailPage() {
                   </div>
                 </div>
 
-                {/* Price Details Table */}
+                {/* Elements Table */}
                 <div className="mb-4">
                   <div className="bg-blue-800 text-white p-2 rounded-t-lg">
-                    <div className="grid grid-cols-3 text-sm text-center">
-                      <div>Element ID รหัสชิ้นส่วน</div>
-                      <div>Amount จำนวน</div>
-                      <div>Price ราคา</div>
+                    <div className="grid grid-cols-4 text-sm text-center">
+                      <div>Element ID</div>
+                      <div>Element Name</div>
+                      <div>Amount</div>
+                      <div>Price</div>
                     </div>
                   </div>
                   <div className="border-x border-b border-black p-2 rounded-b-lg">
-                    <div className="grid grid-cols-3 text-sm text-center text-black">
-                      <div>{orderData.elementId}</div>
-                      <div>{orderData.amount}</div>
-                      <div>{orderData.orderPrice}</div>
-                    </div>
+                    {!quotationData ? (
+                      <div className="text-center text-gray-500 py-2">กำลังโหลดข้อมูล...</div>
+                    ) : !Array.isArray(quotationData.ELEMENTS_IN_QUOTATION) ? (
+                      <div className="text-center text-gray-500 py-2">ไม่พบข้อมูลชิ้นส่วน</div>
+                    ) : quotationData.ELEMENTS_IN_QUOTATION.length === 0 ? (
+                      <div className="text-center text-gray-500 py-2">ยังไม่มีชิ้นส่วน</div>
+                    ) : (
+                      quotationData.ELEMENTS_IN_QUOTATION.map((item: ElementInQuotation) => (
+                        <div key={item.ELEMENT_ID} className="grid grid-cols-4 text-sm text-center text-black">
+                          <div>{item.ELEMENT_ID}</div>
+                          <div>{item.ELEMENT_NAME}</div>
+                          <div>{item.QUANTITY}</div>
+                          <div>{item.TOTAL_PRICE.toLocaleString('th-TH')}</div>
+                        </div>
+                      ))
+                    )}
                   </div>
                 </div>
 
@@ -291,37 +270,45 @@ export default function OrderDetailPage() {
                 <div className="mb-4">
                   <div className="bg-blue-800 text-white p-2 rounded-t-lg">
                     <div className="grid grid-cols-4 text-sm text-center">
-                      <div className="p-2 border-r">Wage ค่าแรง</div>
-                      <div className="p-2 border-r text-center">Total Price ราคารวม</div>
-                      <div className="p-2 border-r">Payment Type ประเภทการชำระเงิน</div>
-                      <div className="p-2">Remark หมายเหตุ</div>
+                      <div>Wage</div>
+                      <div>Total Price</div>
+                      <div>Payment Type</div>
+                      <div>Remark</div>
                     </div>
                   </div>
                   <div className="border-x border-b border-black p-2 rounded-b-lg">
                     <div className="grid grid-cols-4 text-sm text-center text-black">
-                      <div>x,xxx</div>
-                      <div>{orderData.totalPrice}</div>
-                      <div>โอนเงินทางธนาคาร</div>
-                      <div>-</div>
+                      <div>{quotationData?.WAGE?.toLocaleString('th-TH')}</div>
+                      <div>{getTotalPrice(quotationData).toLocaleString('th-TH')}</div>
+                      <div>{quotationData?.PAYMENT_TYPE}</div>
+                      <div>{quotationData?.REMARK || '-'}</div>
                     </div>
                   </div>
                 </div>
+              
 
-                {/* Stacked Action Buttons */}
-                <div className="flex flex-col items-center space-y-2">
-                  <Link
-                    href={`/order_detail/${params.orderId}/add-part`}
-                    className="buttonemerald"
-                  >
-                    เพิ่มชิ้นส่วน
-                  </Link>
-                  <button className="buttonyellow">
-                    ใบเสนอราคา
-                  </button>
+                  {/* Stacked Action Buttons */}
+                  <div className="flex flex-col items-center space-y-2">
+                    <Link  
+                    href={{
+                        pathname:  `/order_detail/${params.orderId}/add-part`,
+                        query: {
+                            quotationNo : quotationData?.QUOTATION_NO
+                        }
+                    }}
+                      className="buttonemerald"
+                    >
+                      เพิ่มชิ้นส่วน
+                    </Link>
+                    <button className="buttonyellow">
+                      <a href='/Quotation'>
+                      ใบเสนอราคา
+                      </a>
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
         </main>
     </div>
   );
